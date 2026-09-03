@@ -1,0 +1,5 @@
+# Keep repo/meta files out of `git archive` output
+# (GitHub's "Source code (zip/tar.gz)" on a release respects this)
+README.md        export-ignore
+.gitignore       export-ignore
+.gitattributes   export-ignore
