@@ -56,6 +56,7 @@ present).
 | `nextIs` / `lastPerson` | who speaks next | `{name}` |
 | `tagNow` / `tagDone` | queue tags | |
 | `pause` / `resume` / `next` / `reset` | buttons of the running view | |
+| `confirmReset` | confirmation before discarding a run in progress | plain text, shown in `confirm()` |
 | `standupDone` | title of the final screen | |
 | `doneSub` | subtitle of the summary | `{people}`, `{total}`, `{target}` |
 | `total` | total row in the summary | |

@@ -4,6 +4,10 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Time is up</title>
+<meta name="description" content="A rotating timer for stand-ups: everyone gets the same time to speak, with automatic or manual turn switching and a per-person summary at the end.">
+<!-- kept in sync with the active theme by app.js -->
+<meta name="theme-color" id="theme-color" content="#f4f5f7">
+<link rel="icon" href="favicon.svg" type="image/svg+xml">
 <link rel="stylesheet" href="src/css/styles.css">
 </head>
 <body>
@@ -11,9 +15,12 @@
   <header class="title">
     <h1><span class="tick" aria-hidden="true">⏱️</span> Time is up</h1>
     <span class="tagline" id="tagline"></span>
-    <button type="button" class="theme" id="theme" aria-label="Toggle theme">🌙</button>
-    <!-- options are filled in by app.js from the registered languages -->
-    <select id="lang" aria-label="Language / Idioma"></select>
+    <!-- grouped so they wrap as one block and stay together on narrow screens -->
+    <div class="title-controls">
+      <button type="button" class="theme" id="theme" aria-label="Toggle theme">🌙</button>
+      <!-- options are filled in by app.js from the registered languages -->
+      <select id="lang" aria-label="Language / Idioma"></select>
+    </div>
   </header>
 
   <!-- ============ SETUP ============ -->
@@ -30,14 +37,14 @@
         <input type="number" id="minutes" min="0.5" max="10" step="0.5" value="1.5">
       </div>
       <div class="field">
-        <label id="lbl-order"></label>
+        <span class="fieldlabel" id="lbl-order"></span>
         <div class="segmented" role="group" aria-labelledby="lbl-order">
           <button type="button" id="order-alpha" aria-pressed="false"></button>
           <button type="button" id="order-random" aria-pressed="true"></button>
         </div>
       </div>
       <div class="field">
-        <label id="lbl-mode"></label>
+        <span class="fieldlabel" id="lbl-mode"></span>
         <div class="segmented" role="group" aria-labelledby="lbl-mode">
           <button type="button" id="mode-auto" aria-pressed="true"></button>
           <button type="button" id="mode-manual" aria-pressed="false"></button>
@@ -61,8 +68,8 @@
   <section id="running" class="card" hidden>
     <div class="stage">
       <div class="eyebrow" id="eyebrow"></div>
-      <div class="speaker" id="speaker">—</div>
-      <div class="clock" id="clock">1:30</div>
+      <div class="speaker" id="speaker" aria-live="polite" aria-atomic="true">—</div>
+      <div class="clock" id="clock" role="timer" aria-live="off">1:30</div>
       <div class="overtime-note" id="overtime-note" hidden></div>
 
       <div class="progress" id="turnbar"><i></i></div>
@@ -90,7 +97,7 @@
   <!-- ============ DONE ============ -->
   <section id="done" class="card" hidden>
     <div class="done-banner">
-      <div class="big" id="done-title"></div>
+      <h2 class="big" id="done-title"></h2>
       <div class="sub" id="done-sub"></div>
     </div>
     <ol class="summary" id="summary"></ol>

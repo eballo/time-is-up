@@ -31,6 +31,7 @@ TimeIsUpI18n.register("nl", "Nederlands", {
   resume: "Hervatten",
   next: "Volgende ›",
   reset: "Opnieuw",
+  confirmReset: "De ronde stoppen en terug naar de instellingen?",
 
   standupDone: "✅ Stand-up klaar",
   doneSub: "{people} · {total} in totaal · doel {target} per persoon",

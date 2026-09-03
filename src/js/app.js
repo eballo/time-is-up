@@ -35,6 +35,35 @@
     return !!(window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches);
   }
 
+  /* The tab is usually not the focused window during a stand-up, so the title
+     carries the state that matters: who is up and how long they have left. */
+  var BASE_TITLE = document.title;
+
+  function setTitle(text) {
+    document.title = text || BASE_TITLE;
+  }
+
+  /* Keeping the screen awake matters most on the phone or tablet someone props
+     up for the meeting. Unsupported, insecure-context and denied all end up in
+     the same place: no lock, no error, timer unaffected. */
+  var wakeLock = null;
+
+  function requestWakeLock() {
+    if (!navigator.wakeLock || wakeLock) return;
+    try {
+      navigator.wakeLock.request("screen").then(function (lock) {
+        wakeLock = lock;
+        lock.addEventListener("release", function () { wakeLock = null; });
+      }, function () { /* denied, hidden tab, or http:// — ignore */ });
+    } catch (e) { /* ignore */ }
+  }
+
+  function releaseWakeLock() {
+    if (!wakeLock) return;
+    try { wakeLock.release(); } catch (e) { /* ignore */ }
+    wakeLock = null;
+  }
+
   /* Touching localStorage throws in Safari private browsing and whenever the
      browser blocks site data, so every access goes through these. Losing the
      saved preferences is fine; taking the whole app down with it is not. */
@@ -196,10 +225,16 @@
       ? "dark" : "light";
   }
 
+  /* Must track the --bg tokens in styles.css: this is what mobile browsers
+     paint their chrome with, and a stale value looks broken next to the page. */
+  var THEME_COLORS = { light: "#f4f5f7", dark: "#12161c" };
+
   function applyTheme() {
     var s = storedTheme();
     if (s) document.documentElement.setAttribute("data-theme", s);
     else document.documentElement.removeAttribute("data-theme");
+    var meta = document.getElementById("theme-color");
+    if (meta) meta.setAttribute("content", THEME_COLORS[effectiveTheme()]);
     updateThemeButton();
   }
 
@@ -318,21 +353,26 @@
 
   function runPreroll(done) {
     cancelPreroll();
-    var n = PREROLL_SECONDS;
     state.preroll = true;
     el.preroll.hidden = false;
-    showNum(n);
+
+    // Deadline-driven for the same reason as the turn clock, so tabbing away
+    // during the count-in can't leave the run parked on "5".
+    var endsAt = Date.now() + PREROLL_SECONDS * 1000;
+    var shown = PREROLL_SECONDS;
+    showNum(shown);
 
     state.prerollIv = setInterval(function () {
-      n -= 1;
-      if (n <= 0) {
+      var left = Math.ceil((endsAt - Date.now()) / 1000);
+      if (left <= 0) {
         cancelPreroll();
         beep(2, 920);
         done();
-      } else {
-        showNum(n);
+      } else if (left !== shown) {
+        shown = left;
+        showNum(left);
       }
-    }, 1000);
+    }, 200);
 
     function showNum(v) {
       el.prerollNum.textContent = v;
@@ -354,7 +394,7 @@
 
   /* ============ fireworks ============ */
 
-  var fw = { raf: null, ctx: null, particles: [], onresize: null };
+  var fw = { raf: null, timeout: null, ctx: null, particles: [], onresize: null };
 
   function launchFireworks() {
     stopFireworks();
@@ -380,6 +420,7 @@
 
     var start = performance.now();
     var lastBurst = 0;
+    var prevFrame = start;
     var W = function () { return window.innerWidth; };
     var H = function () { return window.innerHeight; };
     var DURATION = 4200;
@@ -405,6 +446,14 @@
       var elapsed = now - start;
       ctx.clearRect(0, 0, W(), H());
 
+      // Step by elapsed time rather than per frame, so the burst lasts the same
+      // few seconds at 30, 60 or 144 Hz instead of dragging on when frames are
+      // slow. k is "how many 60 Hz frames this one was worth"; the cap keeps a
+      // stalled tab from teleporting every particle off-screen at once.
+      var k = Math.min((now - prevFrame) / (1000 / 60), 3);
+      prevFrame = now;
+      var drag = Math.pow(0.99, k);
+
       if (elapsed < 2800 && now - lastBurst > 380) {
         lastBurst = now;
         spawnBurst((0.12 + Math.random() * 0.76) * W(), (0.12 + Math.random() * 0.5) * H());
@@ -413,17 +462,18 @@
         }
       }
 
-      var alive = false;
+      // Spent particles are dropped rather than carried for the whole run.
+      var living = [];
       for (var i = 0; i < fw.particles.length; i++) {
         var p = fw.particles[i];
-        p.vy += 0.03;           // gravity
-        p.vx *= 0.99;
-        p.vy *= 0.99;
-        p.x += p.vx;
-        p.y += p.vy;
-        p.life -= 0.012;
+        p.vy += 0.03 * k;       // gravity
+        p.vx *= drag;
+        p.vy *= drag;
+        p.x += p.vx * k;
+        p.y += p.vy * k;
+        p.life -= 0.012 * k;
         if (p.life > 0) {
-          alive = true;
+          living.push(p);
           ctx.globalAlpha = Math.max(0, Math.min(1, p.life));
           ctx.fillStyle = p.color;
           ctx.beginPath();
@@ -431,9 +481,10 @@
           ctx.fill();
         }
       }
+      fw.particles = living;
       ctx.globalAlpha = 1;
 
-      if (elapsed < DURATION || alive) {
+      if (elapsed < DURATION || living.length) {
         fw.raf = requestAnimationFrame(frame);
       } else {
         stopFireworks();
@@ -441,10 +492,15 @@
     }
 
     fw.raf = requestAnimationFrame(frame);
+    // requestAnimationFrame is paused while the tab is hidden, so a run that
+    // ends just before someone tabs away would leave the canvas up until they
+    // came back. Wall-clock backstop that does not depend on frames at all.
+    fw.timeout = setTimeout(stopFireworks, DURATION + 4000);
   }
 
   function stopFireworks() {
     if (fw.raf) { cancelAnimationFrame(fw.raf); fw.raf = null; }
+    if (fw.timeout) { clearTimeout(fw.timeout); fw.timeout = null; }
     if (fw.onresize) { window.removeEventListener("resize", fw.onresize); fw.onresize = null; }
     if (fw.ctx) fw.ctx.clearRect(0, 0, el.fireworks.width, el.fireworks.height);
     fw.particles = [];
@@ -468,6 +524,7 @@
     el.clock.textContent = clock(state.perTurn);
     el.clock.className = "clock";
     renderQueue();
+    requestWakeLock();   // must ride the click that got us here
 
     runPreroll(function () { beginTurn(0); });
   }
@@ -539,6 +596,8 @@
 
   function finishRun() {
     stopTicker();
+    releaseWakeLock();
+    setTitle(null);
     state.running = false;
     renderSummary();
     beep(2);
@@ -578,6 +637,8 @@
     if (r < 0 || frac <= 0.15) barCls += " danger";
     else if (frac <= 0.4) barCls += " warn";
     el.turnbar.className = barCls;
+
+    setTitle(clock(r) + " · " + state.list[state.index]);
   }
 
   function renderTurn() {
@@ -686,9 +747,18 @@
     cancelPreroll();
     stopFireworks();
     stopTicker();
+    releaseWakeLock();
+    setTitle(null);
     state.running = false;
     show("setup");
     refreshEstimate();
+  }
+
+  /* Reset throws away a run in progress, so confirm that one. From the summary
+     there is nothing left to lose, so it goes straight through. */
+  function requestReset() {
+    if (!el.running.hidden && !window.confirm(t("confirmReset"))) return;
+    resetToSetup();
   }
 
   /* ============ events ============ */
@@ -700,7 +770,7 @@
   });
   if (window.matchMedia) {
     var mq = window.matchMedia("(prefers-color-scheme: dark)");
-    var onMq = function () { if (!storedTheme()) updateThemeButton(); };
+    var onMq = function () { if (!storedTheme()) applyTheme(); };
     if (mq.addEventListener) mq.addEventListener("change", onMq);
     else if (mq.addListener) mq.addListener(onMq);
   }
@@ -708,7 +778,11 @@
   // Coming back to a throttled tab: catch the clock up immediately instead of
   // waiting for the next (possibly long-delayed) interval callback.
   document.addEventListener("visibilitychange", function () {
-    if (!document.hidden && state.running && !el.running.hidden) tick();
+    if (document.hidden || el.running.hidden) return;
+    if (state.running) tick();
+    // The browser drops the screen lock whenever the tab is hidden, so a run
+    // that survives a tab switch has to ask for it again.
+    requestWakeLock();
   });
 
   el.lang.addEventListener("change", function () { setLang(el.lang.value); });
@@ -728,7 +802,7 @@
   });
   el.pause.addEventListener("click", togglePause);
   el.next.addEventListener("click", advance);
-  el.reset.addEventListener("click", resetToSetup);
+  el.reset.addEventListener("click", requestReset);
   el.again.addEventListener("click", resetToSetup);
 
   document.addEventListener("keydown", function (e) {
@@ -747,13 +821,15 @@
       if (e.code === "Space" || e.code === "Enter" || e.code === "ArrowRight" || e.code === "Escape") {
         e.preventDefault();
         if (state.skipPreroll) state.skipPreroll();
+      } else if (e.key === "r" || e.key === "R") {
+        requestReset();   // the Reset button works here too; keep the key in step
       }
       return;
     }
 
     if (e.code === "Space") { e.preventDefault(); togglePause(); }
     else if (e.code === "ArrowRight") { e.preventDefault(); advance(); }
-    else if (e.key === "r" || e.key === "R") { resetToSetup(); }
+    else if (e.key === "r" || e.key === "R") { requestReset(); }
   });
 
   /* ============ init ============ */

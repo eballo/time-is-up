@@ -7,6 +7,39 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.0.1] - 2026-09-03
+
+### Added
+
+- Favicon, so the tab is identifiable and the site stops answering
+  `/favicon.ico` with a 404. Also a meta description and a `theme-color` that
+  follows the active theme.
+- The tab title now carries the state that matters while the window is in the
+  background: `1:23 · Anna`, restored to the plain name once the round ends.
+- A screen wake lock during a run, so the phone or tablet propped up for the
+  meeting stops dimming halfway through. Re-acquired after a tab switch, and a
+  no-op where the API is missing or the context is insecure.
+- A confirmation before Reset discards a run in progress — one stray `R`
+  used to wipe it. New `confirmReset` translation key.
+
+### Changed
+
+- **The layout is properly responsive.** The running view — the one people
+  actually watch during a stand-up — now fits without scrolling on every size
+  tested, from a 320×568 phone to a 1920×1080 desktop, in portrait and
+  landscape. Previously it needed 158px of scrolling on an iPhone 8 and 425px
+  on a phone in landscape, because the clock and speaker were sized off
+  viewport *width* only and stayed huge on short screens; both are now capped
+  by viewport height as well. Phones get tighter padding, full-width controls
+  and 44px touch targets (the theme button was 28px); on genuinely short
+  screens the participant queue scrolls inside itself so the clock and buttons
+  stay put, and on a landscape phone it gives way entirely. Long names can no
+  longer widen a row.
+- Fireworks motion is driven by elapsed time instead of per-frame steps, so it
+  lasts the same few seconds on a 144 Hz display as on a 60 Hz one. Spent
+  particles are dropped rather than carried, and a wall-clock backstop tears the
+  canvas down even if the tab is hidden and no frames ever run.
+
 ### Fixed
 
 - **The countdown no longer freezes in a background tab.** It was decrementing a
@@ -24,6 +57,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   it throws in Safari private browsing and whenever site data is blocked, and the
   first read happened during init, aborting the whole script. All access is now
   guarded; preferences are simply not persisted in that case.
+- The five-second start countdown is on the same wall clock as the turn timer,
+  so tabbing away during the count-in no longer parks a run on "5".
+- Accessibility: turn changes are announced (`aria-live` on the speaker), the
+  clock is a `role="timer"` that does not spam a screen reader every second,
+  the two `<label>` elements that labelled button groups rather than a form
+  control are now `<span>`s, and the summary heading is a real `<h2>`.
+- Pressing `R` during the start countdown now offers to reset, matching what
+  the Reset button already did there.
 
 ## [1.0.0] - 2026-09-03
 
@@ -52,5 +93,6 @@ First release.
 - Preferences persisted in `localStorage`; animations honour
   `prefers-reduced-motion`.
 
-[Unreleased]: https://github.com/eballo/time-is-up/compare/v1.0.0...HEAD
+[Unreleased]: https://github.com/eballo/time-is-up/compare/v1.0.1...HEAD
+[1.0.1]: https://github.com/eballo/time-is-up/compare/v1.0.0...v1.0.1
 [1.0.0]: https://github.com/eballo/time-is-up/releases/tag/v1.0.0

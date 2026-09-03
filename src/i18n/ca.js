@@ -31,6 +31,7 @@ TimeIsUpI18n.register("ca", "Català", {
   resume: "Reprèn",
   next: "Següent ›",
   reset: "Reinicia",
+  confirmReset: "Vols aturar la ronda i tornar a la configuració?",
 
   standupDone: "✅ Stand-up acabat",
   doneSub: "{people} · {total} en total · objectiu {target} per persona",

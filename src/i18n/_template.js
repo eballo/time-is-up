@@ -50,6 +50,8 @@ TimeIsUpI18n.register("xx", "Language name", {
   resume: "Resume",
   next: "Next ›",
   reset: "Reset",
+  // shown in a confirm() when Reset would discard a run in progress
+  confirmReset: "Stop the round and go back to setup?",
 
   /* done screen */
   standupDone: "✅ Stand-up finished",

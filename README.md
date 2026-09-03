@@ -53,9 +53,18 @@ Static page: **no build, no dependencies, no backend**. Open it directly
   default; clicking it pins a choice, which is remembered.
 - **Help panel** — a collapsible "What Time is up is and how it works" section
   with the explanation and shortcuts, in the active language.
+- **Responsive** from a 320px phone to a large desktop, portrait and landscape.
+  The running view always fits without scrolling; on a phone the controls go
+  full-width with 44px touch targets, and on very short screens the queue
+  scrolls inside itself so the clock and buttons stay put.
+- **Tab title** shows the state while the window is in the background:
+  `1:23 · Anna`.
+- **Screen wake lock** during a run, so a propped-up phone or tablet does not
+  dim halfway through. Silently skipped where unsupported.
 - **Detail**: the title does a small animation on hover.
-- **Accessibility**: the countdown, the fireworks and the animations honour
-  `prefers-reduced-motion`.
+- **Accessibility**: turn changes are announced to screen readers, the clock is
+  a `role="timer"` that does not read out every second, and the countdown,
+  fireworks and animations honour `prefers-reduced-motion`.
 
 ### Persistence
 
@@ -73,7 +82,7 @@ English.
 | Skip the start countdown | any key or click |
 | Pause / Resume | `Space` |
 | Next person | `→` |
-| Back to setup | `R` |
+| Back to setup (asks first during a run) | `R` |
 
 ---
 

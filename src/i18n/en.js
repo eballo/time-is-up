@@ -31,6 +31,7 @@ TimeIsUpI18n.register("en", "English", {
   resume: "Resume",
   next: "Next ›",
   reset: "Reset",
+  confirmReset: "Stop the round and go back to setup?",
 
   standupDone: "✅ Stand-up finished",
   doneSub: "{people} · {total} in total · target {target} per person",
