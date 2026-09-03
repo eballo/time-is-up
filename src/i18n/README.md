@@ -10,29 +10,32 @@ cp src/i18n/_template.js src/i18n/de.js
 
 1. Edit `src/i18n/de.js`: change the code (`"de"`), the label (`"Deutsch"`) and
    translate every value. **Do not touch the `{placeholders}`.**
-2. In `index.html`, add the line next to the others:
+2. In `src/i18n/index.js`, import it and add it to the array:
 
-   ```html
-   <script src="src/i18n/de.js"></script>
+   ```js
+   import de from "./de.js";
+   export const languages = [ca, es, en, fr, nl, de];
    ```
 
-That's it. The language picker picks up the new code on its own.
+That's it. The language picker is built from that array, so it picks up the new
+code on its own.
 
 ## Removing a language
 
-Delete the file `src/i18n/<code>.js` and its `<script>` line in `index.html`.
+Delete the file `src/i18n/<code>.js` and both of its lines in `index.js`.
 If someone had that language stored in their browser, it falls back automatically
 to the fallback language (English, or the first registered one if English is not
 present).
 
 ## How it works
 
-- `registry.js` exposes `window.TimeIsUpI18n` with `register()`, `languages()`,
-  `dict()`, `has()` and `fallback()`.
-- `src/js/app.js` builds the `<select>` from `languages()` and translates with
-  `t(key)`. If a key is missing in a language it falls back to the fallback
-  language; if it is missing there too, it shows the key name.
-- Load order in `index.html`: `registry.js` → language files → `app.js`.
+- Each language file default-exports `{ code, label, strings }`.
+- `index.js` collects them into `languages` and names the `FALLBACK_LANGUAGE`.
+- `src/js/services/translator.js` wraps that list. `translate(key)` falls back to
+  the fallback language when a key is missing, and to the key name itself when it
+  is missing there too — so a half-finished language degrades to English rather
+  than blanking the interface.
+- `src/js/app.js` builds the `<select>` from `translator.languages`.
 
 ## Translation keys
 
@@ -56,6 +59,7 @@ present).
 | `nextIs` / `lastPerson` | who speaks next | `{name}` |
 | `tagNow` / `tagDone` | queue tags | |
 | `pause` / `resume` / `next` / `reset` | buttons of the running view | |
+| `confirmReset` | confirmation before discarding a run in progress | plain text, shown in `confirm()` |
 | `standupDone` | title of the final screen | |
 | `doneSub` | subtitle of the summary | `{people}`, `{total}`, `{target}` |
 | `total` | total row in the summary | |

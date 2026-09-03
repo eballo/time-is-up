@@ -55,6 +55,7 @@ body {
   min-height: 100vh;
   display: flex;
   justify-content: center;
+  align-items: safe center;
   padding: 32px 20px 64px;
   transition: background .25s ease, color .25s ease;
 }
@@ -93,9 +94,14 @@ header.title h1:hover .tick { animation: tick-spin .6s ease; }
 }
 header.title span.tagline { color: var(--muted); font-size: 14px; }
 
-header.title button.theme {
-  align-self: center;
+header.title .title-controls {
+  display: flex;
+  align-items: center;
+  gap: 10px;
   margin-left: auto;
+}
+
+header.title button.theme {
   padding: 6px 9px;
   border: 1px solid var(--border);
   border-radius: 8px;
@@ -106,7 +112,6 @@ header.title button.theme {
   cursor: pointer;
 }
 header.title select {
-  align-self: center;
   padding: 6px 10px;
   border: 1px solid var(--border);
   border-radius: 8px;
@@ -124,7 +129,9 @@ header.title select {
 }
 .card + .card { margin-top: 20px; }
 
-label { display: block; font-weight: 600; font-size: 13px; margin-bottom: 8px; }
+/* .fieldlabel is a <span> that only looks like a label: it names a group of
+   buttons via aria-labelledby, and a real <label> may not label a group. */
+label, .fieldlabel { display: block; font-weight: 600; font-size: 13px; margin-bottom: 8px; }
 .hint { color: var(--muted); font-weight: 400; }
 
 textarea {
@@ -152,7 +159,7 @@ textarea:focus, input:focus, select:focus, button:focus-visible {
 }
 .field { flex: 0 0 auto; }
 .field.grow { flex: 1 1 140px; }
-.field label { margin-bottom: 8px; }
+.field label, .field .fieldlabel { margin-bottom: 8px; }
 
 input[type="number"] {
   width: 100%;
@@ -195,17 +202,40 @@ input[type="number"] {
   color: var(--text);
 }
 .btn:hover { border-color: var(--accent); }
+
+/* Filled: the one action that carries the moment forward — Start on setup,
+   Next during a run, Start again on the summary. Never more than one per view. */
 .btn.primary {
   background: var(--accent);
   color: var(--accent-contrast);
   border-color: transparent;
 }
+.btn.primary:hover { filter: brightness(1.08); border-color: transparent; }
 .btn.primary:disabled {
   opacity: .5;
   cursor: not-allowed;
   border-color: transparent;
+  filter: none;
 }
+
+/* Recessed: Reset discards the whole run, so it must not read as a peer of the
+   buttons beside it. It states its intent in red only once you reach for it. */
+.btn.quiet {
+  background: transparent;
+  border-color: transparent;
+  color: var(--muted);
+  font-weight: 600;
+}
+.btn.quiet:hover, .btn.quiet:focus-visible {
+  color: var(--danger);
+  border-color: var(--danger);
+}
+
 .btn-group { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 22px; }
+/* Setup is a form, so its button stays on the left margin with the fields.
+   The run and the summary are centred compositions; their controls follow. */
+#running .btn-group,
+#done .btn-group { justify-content: center; }
 
 .meta {
   margin-top: 16px;
@@ -241,7 +271,7 @@ input[type="number"] {
   color: var(--muted);
 }
 .stage .speaker {
-  font-size: clamp(28px, 7vw, 46px);
+  font-size: clamp(22px, min(7vw, 7vh), 46px);
   font-weight: 800;
   letter-spacing: -0.02em;
   margin: 6px 0 18px;
@@ -249,7 +279,7 @@ input[type="number"] {
 }
 .clock {
   font-variant-numeric: tabular-nums;
-  font-size: clamp(64px, 20vw, 132px);
+  font-size: clamp(56px, min(19vw, 21vh), 132px);
   font-weight: 800;
   line-height: 1;
   letter-spacing: -0.03em;
@@ -293,7 +323,7 @@ input[type="number"] {
   color: var(--muted);
 }
 .preroll-num {
-  font-size: clamp(84px, 26vw, 180px);
+  font-size: clamp(64px, min(26vw, 28vh), 180px);
   font-weight: 800;
   line-height: 1;
   color: var(--accent);
@@ -352,10 +382,12 @@ input[type="number"] {
 }
 .queue li .num {
   width: 22px;
+  flex: 0 0 auto;
   color: var(--muted);
   font-variant-numeric: tabular-nums;
   font-size: 13px;
 }
+.queue li .name { min-width: 0; overflow-wrap: anywhere; }
 .queue li.done { color: var(--muted); }
 .queue li.done .name { text-decoration: line-through; }
 .queue li.current { font-weight: 700; }
@@ -377,7 +409,7 @@ input[type="number"] {
   font-variant-numeric: tabular-nums;
   font-size: 13px;
 }
-.summary li .name { flex: 1 1 auto; }
+.summary li .name { flex: 1 1 auto; min-width: 0; overflow-wrap: anywhere; }
 .summary li .time {
   font-variant-numeric: tabular-nums;
   font-weight: 700;
@@ -406,7 +438,7 @@ input[type="number"] {
 .done-banner .big {
   font-size: 28px;
   font-weight: 800;
-  margin-bottom: 6px;
+  margin: 0 0 6px;
 }
 .done-banner .sub { color: var(--muted); }
 
@@ -428,4 +460,105 @@ input[type="number"] {
   header.title h1:hover .tick,
   .preroll-num.pop,
   .clock.over { animation: none; }
+}
+
+/* ============================================================
+   Responsive
+   The running view is the one that matters: on a phone it has to fit without
+   scrolling, because nobody scrolls a timer mid-meeting. Headline type above is
+   already capped by viewport height; these rules reclaim the space around it.
+   ============================================================ */
+
+/* ---- Phones ---- */
+@media (max-width: 560px) {
+  body { padding: 16px 12px 40px; }
+  .card { padding: 18px 16px; border-radius: 12px; }
+  .card + .card { margin-top: 14px; }
+
+  header.title { margin-bottom: 16px; gap: 8px; }
+  header.title h1 { font-size: 20px; }
+  /* Decorative next to the title, and it is what forces the header to wrap. */
+  header.title span.tagline { display: none; }
+
+  .row { gap: 12px; margin-top: 14px; }
+  /* Two segmented controls sit side by side rather than stacking. */
+  .field { flex: 1 1 auto; }
+  .field.grow { flex: 1 1 100%; }
+  .segmented { width: 100%; }
+  .segmented button { flex: 1 1 0; padding: 10px 8px; }
+
+  textarea { min-height: 132px; }
+  .btn-group { gap: 8px; margin-top: 16px; }
+  .btn { flex: 1 1 auto; padding: 12px 14px; }
+  /* The two actions you actually use share the width; the escape hatch takes
+     only what its label needs. */
+  .btn.quiet { flex: 0 1 auto; }
+
+  .stage .speaker { margin: 4px 0 12px; }
+  .progress { margin: 16px 0 6px; }
+  .queue, .summary { margin-top: 14px; }
+  .queue li, .summary li { padding: 9px 2px; gap: 8px; }
+  .summary li .delta { min-width: 46px; }
+}
+
+/* ---- Short viewports: landscape tablets, laptops, landscape phones ---- */
+@media (max-height: 820px) {
+  body { padding-top: 14px; padding-bottom: 24px; }
+  header.title { margin-bottom: 12px; }
+  .stage .speaker { margin: 2px 0 8px; }
+  .progress { margin: 12px 0 4px; }
+  .queue { margin-top: 10px; }
+  .btn-group { margin-top: 14px; }
+}
+
+/* Genuinely short: keep speaker, clock and controls on screen by letting the
+   queue scroll inside itself rather than pushing them off. */
+@media (max-height: 700px) {
+  .queue {
+    max-height: 26vh;
+    overflow-y: auto;
+    overscroll-behavior: contain;
+    /* keep the "now" tag clear of the scrollbar it just grew */
+    padding-right: 10px;
+    scrollbar-width: thin;
+    /* Fade the cut edge so a half-visible row reads as "more below" rather
+       than as a row that failed to draw. */
+    mask-image: linear-gradient(to bottom, #000 calc(100% - 20px), transparent);
+  }
+}
+
+/* Landscape phones are very short: drop the queue rather than squeeze it. */
+@media (max-height: 460px) and (orientation: landscape) {
+  body { padding-top: 10px; padding-bottom: 16px; }
+  .card { padding: 14px 16px; }
+  header.title { margin-bottom: 8px; }
+  .queue { display: none; }
+  .help { display: none; }
+}
+
+/* ---- Touch: 44px minimum hit area ---- */
+@media (max-width: 560px), (pointer: coarse) {
+  header.title button.theme { min-width: 44px; min-height: 44px; font-size: 17px; }
+  header.title select { min-height: 44px; padding: 8px 10px; }
+  .segmented button { min-height: 44px; }
+  .btn { min-height: 44px; }
+  .help summary { padding: 4px 0; }
+}
+
+/* Put a gap between the pair you use and the one you rarely mean to press. */
+@media (min-width: 561px) {
+  #running .btn-group .btn.quiet { margin-left: 14px; }
+}
+
+/* ---- Large screens: the card can breathe a little ---- */
+@media (min-width: 1100px) {
+  .app { max-width: 780px; }
+}
+
+/* ---- Very narrow (320px): keep the header on one line ---- */
+@media (max-width: 380px) {
+  header.title { gap: 6px; }
+  header.title h1 { font-size: 18px; }
+  header.title .title-controls { gap: 6px; }
+  header.title select { font-size: 12px; padding: 8px 4px; max-width: 100px; }
 }
