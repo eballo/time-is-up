@@ -109,17 +109,8 @@
 
 <canvas id="fireworks" hidden></canvas>
 
-<!-- i18n: registry first, then one file per language.
-     Add a language  -> new src/i18n/<code>.js + a <script> line here.
-     Remove a language -> delete the file + its <script> line. -->
-<script src="src/i18n/registry.js"></script>
-<script src="src/i18n/ca.js"></script>
-<script src="src/i18n/es.js"></script>
-<script src="src/i18n/en.js"></script>
-<script src="src/i18n/fr.js"></script>
-<script src="src/i18n/nl.js"></script>
-
-<!-- app logic -->
-<script src="src/js/app.js"></script>
+<!-- One entry point; everything else is reached through ES module imports.
+     Languages are registered in src/i18n/index.js, not here. -->
+<script type="module" src="src/js/app.js"></script>
 </body>
 </html>

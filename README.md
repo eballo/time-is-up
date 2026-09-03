@@ -4,8 +4,9 @@ A rotating timer for **stand-ups / dailies**. It gives everyone the same time to
 speak and moves on to the next person when the time runs out, so the meeting
 stays short, balanced, and predictable.
 
-Static page: **no build, no dependencies, no backend**. Open it directly
-(`file://`) or serve it from any static host.
+Static page: **no build, no dependencies, no backend**. Serve the folder with
+any static host — the code is ES modules, which browsers refuse to load from
+`file://`, so it needs an http:// origin rather than a double-click.
 
 **Live:** https://eballo.github.io/time-is-up/ · **Changes:** [CHANGELOG.md](CHANGELOG.md)
 
@@ -89,35 +90,56 @@ English.
 ## Project structure
 
 ```
-index.html               Markup + script load order
+index.html                 Markup; loads src/js/app.js as a module
+favicon.svg
 src/
-  css/
-    styles.css            All styles (themes, animations, layout)
+  css/styles.css           All styles (themes, animations, responsive)
   js/
-    app.js                Logic: timer, states, rendering, theme, fireworks
+    app.js                 Wiring only: builds everything, routes events
+    core/                  The rules. No DOM, no browser APIs.
+      turn-timer.js          TurnTimer     one speaker's countdown
+      standup-run.js         StandupRun    who speaks, in what order, for how long
+    services/              Talking to the platform.
+      preferences.js         Preferences   guarded localStorage
+      translator.js          Translator    string lookup with fallback
+      chime.js               Chime         WebAudio cues
+      theme-controller.js    ThemeController
+      screen-wake-lock.js    ScreenWakeLock
+    ui/                    Everything that paints.
+      elements.js            collectElements()  every id, resolved once
+      setup-screen.js        SetupScreen
+      running-screen.js      RunningScreen
+      summary-screen.js      SummaryScreen
+      preroll-countdown.js   PrerollCountdown
+      fireworks.js           Fireworks
+      tab-title.js           TabTitle
+      keyboard-shortcuts.js  KeyboardShortcuts
+    util/
+      dom.js                 small DOM helpers
+      time-format.js         every duration the app displays
   i18n/
-    registry.js           Tiny language registry (window.TimeIsUpI18n)
-    ca.js  es.js  en.js  fr.js  nl.js
-                           One file per language; self-registering
-    _template.js           Copy it to add a language (not loaded)
-    README.md              How to add/remove languages + every key
-README.md
+    index.js                 the language list — add or remove one here
+    ca.js es.js en.js fr.js nl.js
+    _template.js             copy it to add a language (not imported)
+    README.md                how to add/remove languages + every key
 ```
 
-Scripts are **classic** (not ES modules), so `index.html` works when opened
-straight from disk, with no server. Load order: `registry.js` → language files
-→ `app.js`.
+`core/` is deliberately free of the DOM and of browser APIs, so the timing and
+turn-order rules can be reasoned about — and tested — on their own.
 
 ---
 
 ## Running
 
-Open `index.html` in a browser, or serve the folder:
+Serve the folder and open it over http://:
 
 ```sh
 python3 -m http.server 8000
 # http://localhost:8000
 ```
+
+Opening `index.html` straight from disk does not work: browsers block ES module
+loading over `file://`.
 
 ---
 
@@ -127,14 +149,15 @@ python3 -m http.server 8000
 cp src/i18n/_template.js src/i18n/de.js   # edit the code, label and strings
 ```
 
-Add it to `index.html`, next to the others:
+Import it in `src/i18n/index.js` and add it to the array:
 
-```html
-<script src="src/i18n/de.js"></script>
+```js
+import de from "./de.js";
+export const languages = [ca, es, en, fr, nl, de];
 ```
 
-The language picker updates itself. To remove one: delete the file and its
-`<script>` line. Full details and the key reference are in
+The language picker is built from that array, so it updates itself. To remove
+one: delete the file and both of its lines. Full details and the key reference are in
 [`src/i18n/README.md`](src/i18n/README.md).
 
 ---

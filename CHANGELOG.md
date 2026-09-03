@@ -7,6 +7,27 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Changed
+
+- **The JavaScript is now a set of small ES modules built around classes**,
+  replacing a single 854-line IIFE with 45 functions over one shared mutable
+  `state` object. Eighteen files averaging under a hundred lines, split by what
+  they are responsible for: `core/` holds the rules (`TurnTimer`, `StandupRun`)
+  and touches neither the DOM nor any browser API, `services/` wraps the
+  platform (`Preferences`, `Translator`, `Chime`, `ThemeController`,
+  `ScreenWakeLock`), `ui/` holds everything that paints, and `app.js` is
+  reduced to wiring. Behaviour is unchanged; names now say what things are
+  (`chime.timeUp()` rather than `beep(3)`).
+- **Languages are ES modules too.** Each file default-exports
+  `{ code, label, strings }` and `src/i18n/index.js` lists them, replacing the
+  global `TimeIsUpI18n` registry. Adding one is still a file plus a line — an
+  import instead of a `<script>` tag. A stored `tiu.order` of `"alpha"` written
+  by earlier versions is still understood, so upgrading does not silently reset
+  the order preference.
+- **`index.html` no longer opens straight from disk.** Browsers refuse to load
+  ES modules over `file://`, so the folder has to be served over http://. The
+  published site and any static host are unaffected; the README says so.
+
 ## [1.0.1] - 2026-09-03
 
 ### Added
