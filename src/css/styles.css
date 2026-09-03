@@ -55,6 +55,7 @@ body {
   min-height: 100vh;
   display: flex;
   justify-content: center;
+  align-items: safe center;
   padding: 32px 20px 64px;
   transition: background .25s ease, color .25s ease;
 }
@@ -201,17 +202,40 @@ input[type="number"] {
   color: var(--text);
 }
 .btn:hover { border-color: var(--accent); }
+
+/* Filled: the one action that carries the moment forward — Start on setup,
+   Next during a run, Start again on the summary. Never more than one per view. */
 .btn.primary {
   background: var(--accent);
   color: var(--accent-contrast);
   border-color: transparent;
 }
+.btn.primary:hover { filter: brightness(1.08); border-color: transparent; }
 .btn.primary:disabled {
   opacity: .5;
   cursor: not-allowed;
   border-color: transparent;
+  filter: none;
 }
+
+/* Recessed: Reset discards the whole run, so it must not read as a peer of the
+   buttons beside it. It states its intent in red only once you reach for it. */
+.btn.quiet {
+  background: transparent;
+  border-color: transparent;
+  color: var(--muted);
+  font-weight: 600;
+}
+.btn.quiet:hover, .btn.quiet:focus-visible {
+  color: var(--danger);
+  border-color: var(--danger);
+}
+
 .btn-group { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 22px; }
+/* Setup is a form, so its button stays on the left margin with the fields.
+   The run and the summary are centred compositions; their controls follow. */
+#running .btn-group,
+#done .btn-group { justify-content: center; }
 
 .meta {
   margin-top: 16px;
@@ -466,6 +490,9 @@ input[type="number"] {
   textarea { min-height: 132px; }
   .btn-group { gap: 8px; margin-top: 16px; }
   .btn { flex: 1 1 auto; padding: 12px 14px; }
+  /* The two actions you actually use share the width; the escape hatch takes
+     only what its label needs. */
+  .btn.quiet { flex: 0 1 auto; }
 
   .stage .speaker { margin: 4px 0 12px; }
   .progress { margin: 16px 0 6px; }
@@ -494,6 +521,9 @@ input[type="number"] {
     /* keep the "now" tag clear of the scrollbar it just grew */
     padding-right: 10px;
     scrollbar-width: thin;
+    /* Fade the cut edge so a half-visible row reads as "more below" rather
+       than as a row that failed to draw. */
+    mask-image: linear-gradient(to bottom, #000 calc(100% - 20px), transparent);
   }
 }
 
@@ -513,6 +543,11 @@ input[type="number"] {
   .segmented button { min-height: 44px; }
   .btn { min-height: 44px; }
   .help summary { padding: 4px 0; }
+}
+
+/* Put a gap between the pair you use and the one you rarely mean to press. */
+@media (min-width: 561px) {
+  #running .btn-group .btn.quiet { margin-left: 14px; }
 }
 
 /* ---- Large screens: the card can breathe a little ---- */

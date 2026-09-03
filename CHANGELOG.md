@@ -9,6 +9,23 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 
+- **The run controls now say what they are for.** Pause was the filled accent
+  button and Next looked identical to Reset, which had the hierarchy backwards:
+  Next is pressed once per person, Pause occasionally, and Reset throws the whole
+  run away. Next takes the filled accent, Pause is a quiet peer, and Reset is
+  recessed — no border, muted text — turning red only when you reach for it, so
+  a destructive action no longer looks like the button beside it. The colours
+  stay out of it deliberately: the clock's green→amber→red is the only signal
+  that carries meaning, and three coloured buttons would compete with it.
+- Run and summary controls are centred under their centred compositions instead
+  of sitting on the left margin. Setup keeps its button on the left with the
+  form fields.
+- The whole app is vertically centred once it fits the viewport, which mainly
+  shows on a landscape tablet where the card used to sit at the top with dead
+  space below it.
+- A scrollable participant queue fades at its cut edge, so a half-visible row
+  reads as "more below" rather than as a row that failed to draw.
+
 - **The JavaScript is now a set of small ES modules built around classes**,
   replacing a single 854-line IIFE with 45 functions over one shared mutable
   `state` object. Eighteen files averaging under a hundred lines, split by what
