@@ -1,107 +1,107 @@
 # ⏱️ Time is up
 
-Timer rotatiu per als **stand-ups / dailies**. Dona a cada persona el mateix
-temps per parlar i, quan s'acaba, passa a la següent. Així la reunió és curta,
-equilibrada i tothom sap quan li toca.
+A rotating timer for **stand-ups / dailies**. It gives everyone the same time to
+speak and moves on to the next person when the time runs out, so the meeting
+stays short, balanced, and predictable.
 
-Pàgina estàtica: **sense build, sense dependències, sense backend**. S'obre
-directament (`file://`) o es serveix des de qualsevol hosting estàtic.
-
----
-
-## Funcionalitats
-
-### Configuració
-
-- **Llista de persones** — una per línia en un quadre de text.
-- **Minuts per persona** — de 0,5 a 10, en passos de 0,5 (igual per a tothom).
-- **Ordre** — **Alfabètic** (segons la locale de l'idioma actiu) o **Aleatori**
-  (barreja Fisher–Yates). L'ordre es fixa en prémer *Start*.
-- **Canvi de persona**
-  - **Automàtic** — en arribar a 0 salta sol a la persona següent.
-  - **Manual** — en arribar a 0 sona l'avís, el rellotge continua comptant en
-    positiu (`+M:SS`) i esperes a prémer **Següent ›** per canviar.
-- **Estimació** — sota el botó es mostra `N persones · X min cadascú · ~Y min en
-  total` (marcat com a orientatiu en mode manual).
-
-### Durant la ronda
-
-- **Compte enrere d'inici** — 5 segons («Prepara't» → 5·4·3·2·1) abans de la
-  primera persona. Es pot saltar amb qualsevol tecla o fent clic.
-- **Rellotge gran** amb estats de color: verd → groc (≤40 %) → vermell (≤15 %)
-  → parpelleig quan passa de 0.
-- **Avís sonor** generat amb WebAudio (cap fitxer d'àudio): tics durant el compte
-  enrere, triple to en arribar a 0, doble to en acabar.
-- **Barra de progrés** del torn i indicador de *«Persona X de Y»* / *«Següent: …»*.
-- **Cua de participants** amb l'estat de cadascú (ara / fet / pendent).
-- **Controls**: Pausa / Reprèn, Següent ›, Reinicia.
-
-### En acabar
-
-- **Resum** amb el temps real que ha parlat cada persona, la **diferència
-  respecte l'objectiu** (`+M:SS` en vermell si s'ha passat, `−M:SS` en verd si ha
-  anat curt) i el **total**.
-- **Focs artificials** — animació de celebració a `<canvas>` (~4 s).
-
-### Interfície
-
-- **Multiidioma**: català, castellà, anglès, francès i neerlandès. Es detecta
-  l'idioma del navegador i es recorda la tria. Afegir o treure idiomes és **un
-  fitxer + una línia** → vegeu [`src/i18n/README.md`](src/i18n/README.md).
-- **Tema clar / fosc** — botó ☀️/🌙 a la capçalera. Per defecte segueix el
-  sistema; en clicar-lo el fixes i es recorda.
-- **Panell d'ajuda** — desplegable «Què és Time is up i com funciona» amb
-  l'explicació i les dreceres, en l'idioma actiu.
-- **Detall**: el títol fa una petita animació en passar-hi el ratolí.
-- **Accessibilitat**: el compte enrere, els focs artificials i les animacions
-  respecten `prefers-reduced-motion`.
-
-### Persistència
-
-Es guarden al navegador (`localStorage`): llista de noms, minuts, ordre, mode de
-canvi, idioma i tema. Si l'idioma desat ja no existeix, torna a l'anglès.
+Static page: **no build, no dependencies, no backend**. Open it directly
+(`file://`) or serve it from any static host.
 
 ---
 
-## Dreceres de teclat
+## Features
 
-| Acció | Tecla |
+### Setup
+
+- **People list** — one name per line in a text box.
+- **Minutes per person** — 0.5 to 10, in steps of 0.5 (same for everyone).
+- **Order** — **Alphabetical** (using the active language's locale) or **Random**
+  (Fisher–Yates shuffle). The order is locked in when you press *Start*.
+- **Turn switching**
+  - **Automatic** — moves to the next person on its own when the clock hits 0.
+  - **Manual** — at 0 the alert sounds, the clock keeps counting up (`+M:SS`)
+    and it waits for you to press **Next ›**.
+- **Estimate** — shown under the button: `N people · X min each · ~Y min total`
+  (flagged as approximate in manual mode).
+
+### During a round
+
+- **Start countdown** — 5 seconds ("Get ready" → 5·4·3·2·1) before the first
+  person. Skippable with any key or a click.
+- **Large clock** with colour states: green → amber (≤40%) → red (≤15%) →
+  blinking once it goes past 0.
+- **Sound cues** generated with WebAudio (no audio files): ticks during the
+  countdown, a triple tone at 0, a double tone at the end.
+- **Progress bar** for the turn plus a *"Person X of Y"* / *"Next: …"* indicator.
+- **Participant queue** showing each person's state (now / done / upcoming).
+- **Controls**: Pause / Resume, Next ›, Reset.
+
+### At the end
+
+- **Summary** with each person's actual speaking time, the **difference vs. the
+  target** (`+M:SS` in red if over, `−M:SS` in green if under) and the **total**.
+- **Fireworks** — a short celebratory `<canvas>` animation (~4s).
+
+### Interface
+
+- **Multi-language**: Catalan, Spanish, English, French and Dutch. The browser
+  language is detected and the choice is remembered. Adding or removing a
+  language is **one file + one line** → see [`src/i18n/README.md`](src/i18n/README.md).
+- **Light / dark theme** — a ☀️/🌙 button in the header. Follows the system by
+  default; clicking it pins a choice, which is remembered.
+- **Help panel** — a collapsible "What Time is up is and how it works" section
+  with the explanation and shortcuts, in the active language.
+- **Detail**: the title does a small animation on hover.
+- **Accessibility**: the countdown, the fireworks and the animations honour
+  `prefers-reduced-motion`.
+
+### Persistence
+
+Stored in the browser (`localStorage`): people list, minutes, order, turn-switch
+mode, language and theme. If a stored language no longer exists, it falls back to
+English.
+
+---
+
+## Keyboard shortcuts
+
+| Action | Key |
 |---|---|
-| Començar (des de la configuració) | `Espai` |
-| Saltar el compte enrere d'inici | qualsevol tecla o clic |
-| Pausa / Reprèn | `Espai` |
-| Següent persona | `→` |
-| Tornar a la configuració | `R` |
+| Start (from the setup screen) | `Space` |
+| Skip the start countdown | any key or click |
+| Pause / Resume | `Space` |
+| Next person | `→` |
+| Back to setup | `R` |
 
 ---
 
-## Estructura del projecte
+## Project structure
 
 ```
-index.html               Marcatge + ordre de càrrega dels scripts
+index.html               Markup + script load order
 src/
   css/
-    styles.css            Tots els estils (temes, animacions, layout)
+    styles.css            All styles (themes, animations, layout)
   js/
-    app.js                Lògica: timer, estats, render, tema, focs artificials
+    app.js                Logic: timer, states, rendering, theme, fireworks
   i18n/
-    registry.js           Motor mínim d'idiomes (window.TimeIsUpI18n)
+    registry.js           Tiny language registry (window.TimeIsUpI18n)
     ca.js  es.js  en.js  fr.js  nl.js
-                           Un fitxer per idioma; es registra sol
-    _template.js           Còpia-la per fer un idioma nou (no es carrega)
-    README.md              Com afegir/treure idiomes + totes les claus
+                           One file per language; self-registering
+    _template.js           Copy it to add a language (not loaded)
+    README.md              How to add/remove languages + every key
 README.md
 ```
 
-Els scripts són **clàssics** (no ES modules), així que `index.html` funciona
-obrint-lo directament al navegador, sense servidor. Ordre de càrrega:
-`registry.js` → fitxers d'idioma → `app.js`.
+Scripts are **classic** (not ES modules), so `index.html` works when opened
+straight from disk, with no server. Load order: `registry.js` → language files
+→ `app.js`.
 
 ---
 
-## Ús
+## Running
 
-Obre `index.html` al navegador, o serveix la carpeta:
+Open `index.html` in a browser, or serve the folder:
 
 ```sh
 python3 -m http.server 8000
@@ -110,25 +110,25 @@ python3 -m http.server 8000
 
 ---
 
-## Afegir un idioma (resum)
+## Adding a language (short version)
 
 ```sh
-cp src/i18n/_template.js src/i18n/de.js   # edita codi, etiqueta i textos
+cp src/i18n/_template.js src/i18n/de.js   # edit the code, label and strings
 ```
 
-Afegeix a `index.html`, al costat dels altres:
+Add it to `index.html`, next to the others:
 
 ```html
 <script src="src/i18n/de.js"></script>
 ```
 
-El selector d'idioma s'actualitza sol. Per treure'n un: esborra el fitxer i la
-seva línia `<script>`. Detalls i taula de claus a
+The language picker updates itself. To remove one: delete the file and its
+`<script>` line. Full details and the key reference are in
 [`src/i18n/README.md`](src/i18n/README.md).
 
 ---
 
-## Desplegament
+## Deployment
 
-És una pàgina estàtica: qualsevol hosting serveix (GitHub Pages, Netlify, un
-bucket S3…). Per **GitHub Pages**, activa Pages sobre la branca `main` / arrel.
+It is a static page — any host works (GitHub Pages, Netlify, an S3 bucket…). For
+**GitHub Pages**, enable Pages on the `main` branch / root.

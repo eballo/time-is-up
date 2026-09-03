@@ -1,66 +1,67 @@
-# Idiomes / Languages
+# Languages
 
-Cada idioma és **un fitxer** `src/i18n/<codi>.js` que es registra sol.
+Each language is **one file** `src/i18n/<code>.js` that registers itself.
 
-## Afegir un idioma
+## Adding a language
 
 ```sh
 cp src/i18n/_template.js src/i18n/de.js
 ```
 
-1. Edita `src/i18n/de.js`: canvia el codi (`"de"`), l'etiqueta (`"Deutsch"`) i
-   tradueix tots els valors. **No toquis els `{placeholders}`.**
-2. A `index.html`, afegeix la línia al costat de les altres:
+1. Edit `src/i18n/de.js`: change the code (`"de"`), the label (`"Deutsch"`) and
+   translate every value. **Do not touch the `{placeholders}`.**
+2. In `index.html`, add the line next to the others:
 
    ```html
    <script src="src/i18n/de.js"></script>
    ```
 
-Ja està. El selector d'idioma s'actualitza sol amb el nou codi.
+That's it. The language picker picks up the new code on its own.
 
-## Treure un idioma
+## Removing a language
 
-Esborra el fitxer `src/i18n/<codi>.js` i la seva línia `<script>` a `index.html`.
-Si algú tenia aquell idioma desat al navegador, torna automàticament a l'idioma
-de reserva (anglès, o el primer registrat si l'anglès no hi és).
+Delete the file `src/i18n/<code>.js` and its `<script>` line in `index.html`.
+If someone had that language stored in their browser, it falls back automatically
+to the fallback language (English, or the first registered one if English is not
+present).
 
-## Com funciona
+## How it works
 
-- `registry.js` exposa `window.TimeIsUpI18n` amb `register()`, `languages()`,
-  `dict()`, `has()` i `fallback()`.
-- `src/js/app.js` construeix el `<select>` a partir de `languages()` i tradueix
-  amb `t(clau)`. Si una clau falta en un idioma, cau a l'idioma de reserva; si hi
-  falta també, mostra el nom de la clau.
-- Ordre de càrrega a `index.html`: `registry.js` → fitxers d'idioma → `app.js`.
+- `registry.js` exposes `window.TimeIsUpI18n` with `register()`, `languages()`,
+  `dict()`, `has()` and `fallback()`.
+- `src/js/app.js` builds the `<select>` from `languages()` and translates with
+  `t(key)`. If a key is missing in a language it falls back to the fallback
+  language; if it is missing there too, it shows the key name.
+- Load order in `index.html`: `registry.js` → language files → `app.js`.
 
-## Claus de traducció
+## Translation keys
 
-| Clau | On surt | Notes |
+| Key | Where it shows | Notes |
 |---|---|---|
-| `tagline` | subtítol de la capçalera | |
-| `namesPlaceholder` | exemple dins el quadre de noms | separa noms amb `\n` |
-| `people` | etiqueta del quadre de noms | |
-| `peopleHint` | pista al costat de `people` | |
-| `minutesLabel` | etiqueta del camp de minuts | |
-| `order` / `orderAlpha` / `orderRandom` | selector d'ordre | |
-| `changeMode` / `modeAuto` / `modeManual` | selector automàtic/manual | |
-| `start` | botó d'inici | |
-| `addPeople` | text quan la llista és buida | |
-| `estimate` | resum sota el botó | `{people}`, `{min}`, `{total}` |
-| `estimateManualSuffix` | s'afegeix a `estimate` en mode manual | inclou l'espai inicial |
-| `personOne` / `personOther` | plural de «persona» | 1 vs. la resta |
-| `nowSpeaking` / `manualTag` | eyebrow de la vista en marxa | |
-| `overtimeNote` | avís quan s'acaba el temps (manual) | |
-| `personXofY` | «Persona i de n» | `{i}`, `{n}` |
-| `nextIs` / `lastPerson` | qui parla després | `{name}` |
-| `tagNow` / `tagDone` | etiquetes de la cua | |
-| `pause` / `resume` / `next` / `reset` | botons de la vista en marxa | |
-| `standupDone` | títol de la pantalla final | |
-| `doneSub` | subtítol del resum | `{people}`, `{total}`, `{target}` |
-| `total` | fila de total al resum | |
-| `restart` | botó de tornar a començar | |
-| `getReady` | text sobre el compte enrere de 5 s | |
-| `prerollSkip` | pista per saltar-se el compte enrere | |
-| `themeToggle` | títol/aria-label del botó clar/fosc | |
-| `helpTitle` | text del `<summary>` del panell d'ajuda | |
-| `helpText` | cos del panell d'ajuda | un paràgraf per línia (`\n`) |
+| `tagline` | header subtitle | |
+| `namesPlaceholder` | example inside the names box | separate names with `\n` |
+| `people` | label of the names box | |
+| `peopleHint` | hint next to `people` | |
+| `minutesLabel` | label of the minutes field | |
+| `order` / `orderAlpha` / `orderRandom` | order selector | |
+| `changeMode` / `modeAuto` / `modeManual` | automatic/manual selector | |
+| `start` | start button | |
+| `addPeople` | text shown when the list is empty | |
+| `estimate` | summary under the button | `{people}`, `{min}`, `{total}` |
+| `estimateManualSuffix` | appended to `estimate` in manual mode | include the leading space |
+| `personOne` / `personOther` | plural of "person" | 1 vs. the rest |
+| `nowSpeaking` / `manualTag` | eyebrow of the running view | |
+| `overtimeNote` | alert when time runs out (manual) | |
+| `personXofY` | "Person i of n" | `{i}`, `{n}` |
+| `nextIs` / `lastPerson` | who speaks next | `{name}` |
+| `tagNow` / `tagDone` | queue tags | |
+| `pause` / `resume` / `next` / `reset` | buttons of the running view | |
+| `standupDone` | title of the final screen | |
+| `doneSub` | subtitle of the summary | `{people}`, `{total}`, `{target}` |
+| `total` | total row in the summary | |
+| `restart` | "start again" button | |
+| `getReady` | text above the 5s countdown | |
+| `prerollSkip` | hint for skipping the countdown | |
+| `themeToggle` | title/aria-label of the light/dark button | |
+| `helpTitle` | text of the help panel `<summary>` | |
+| `helpText` | body of the help panel | one paragraph per line (`\n`) |
