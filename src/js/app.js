@@ -35,6 +35,17 @@
     return !!(window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches);
   }
 
+  /* Touching localStorage throws in Safari private browsing and whenever the
+     browser blocks site data, so every access goes through these. Losing the
+     saved preferences is fine; taking the whole app down with it is not. */
+  function lsGet(key) {
+    try { return window.localStorage.getItem(key); } catch (e) { return null; }
+  }
+
+  function lsSet(key, value) {
+    try { window.localStorage.setItem(key, value); } catch (e) { /* not persisted */ }
+  }
+
   /* ============ state ============ */
 
   var LS_NAMES = "tiu.names";
@@ -77,6 +88,8 @@
     index: 0,              // current speaker index
     perTurn: 90,           // seconds per person (target)
     remaining: 90,         // seconds left in current turn (can go negative)
+    deadline: null,        // wall-clock ms when this turn hits 0 (null = paused)
+    beeped: false,         // time's-up alert already sounded for this turn
     running: false,        // timer ticking
     ticker: null,
     spent: [],             // [{ name, seconds }] actual time per person
@@ -172,7 +185,7 @@
   /* ============ theme ============ */
 
   function storedTheme() {
-    var v = localStorage.getItem(LS_THEME);
+    var v = lsGet(LS_THEME);
     return (v === "light" || v === "dark") ? v : null; // null = follow system
   }
 
@@ -211,7 +224,7 @@
 
   function setLang(lang) {
     state.lang = I18N.has(lang) ? lang : FALLBACK;
-    localStorage.setItem(LS_LANG, state.lang);
+    lsSet(LS_LANG, state.lang);
     el.lang.value = state.lang;
     document.documentElement.lang = state.lang;
     applyStaticI18n();
@@ -276,14 +289,14 @@
     state.order = order;
     el.orderAlpha.setAttribute("aria-pressed", String(order === "alpha"));
     el.orderRandom.setAttribute("aria-pressed", String(order === "random"));
-    localStorage.setItem(LS_ORDER, order);
+    lsSet(LS_ORDER, order);
   }
 
   function setMode(mode) {
     state.mode = mode;
     el.modeAuto.setAttribute("aria-pressed", String(mode === "auto"));
     el.modeManual.setAttribute("aria-pressed", String(mode === "manual"));
-    localStorage.setItem(LS_MODE, mode);
+    lsSet(LS_MODE, mode);
     refreshEstimate();
   }
 
@@ -446,8 +459,8 @@
     state.perTurn = Math.round(clampMinutes(el.minutes.value) * 60);
     state.index = 0;
     state.spent = [];
-    localStorage.setItem(LS_NAMES, el.names.value);
-    localStorage.setItem(LS_MINUTES, String(clampMinutes(el.minutes.value)));
+    lsSet(LS_NAMES, el.names.value);
+    lsSet(LS_MINUTES, String(clampMinutes(el.minutes.value)));
 
     show("running");
     // prime the stage so it looks right behind the countdown overlay
@@ -462,14 +475,31 @@
   function beginTurn(i) {
     state.index = i;
     state.remaining = state.perTurn;
+    state.beeped = false;
     state.running = true;
     startTicker();
     renderTurn();
   }
 
+  /*
+   * The countdown is derived from a wall-clock deadline rather than counted
+   * down a second at a time: browsers throttle timers in hidden tabs (and
+   * stop them while the machine sleeps), which would otherwise silently
+   * freeze the clock the moment someone switches away mid stand-up.
+   */
+  function syncRemaining() {
+    if (state.running && state.deadline != null) {
+      state.remaining = Math.ceil((state.deadline - Date.now()) / 1000);
+    }
+    return state.remaining;
+  }
+
   function startTicker() {
     stopTicker();
-    state.ticker = setInterval(tick, 1000);
+    state.deadline = Date.now() + state.remaining * 1000;
+    // Sub-second polling so the display lands on each new second promptly;
+    // tick() itself is cheap and redraws only when the second actually changes.
+    state.ticker = setInterval(tick, 250);
     el.pause.textContent = t("pause");
   }
 
@@ -478,16 +508,22 @@
   }
 
   function tick() {
-    state.remaining -= 1;
-    if (state.remaining === 0) beep(3);
-    renderClock();
-    if (state.mode === "auto" && state.remaining === -1) {
-      advance();
+    var prev = state.remaining;
+    var now = syncRemaining();
+    if (now === prev) return;
+
+    if (now <= 0 && !state.beeped) {
+      state.beeped = true;
+      beep(3);
     }
+    renderClock();
+    // Only ever one step per tick: the next turn gets a fresh full deadline,
+    // so returning from a long absence never stampedes through the queue.
+    if (state.mode === "auto" && now <= -1) advance();
   }
 
   function recordCurrent() {
-    var elapsed = state.perTurn - state.remaining;
+    var elapsed = state.perTurn - syncRemaining();
     if (elapsed < 0) elapsed = 0;
     state.spent.push({ name: state.list[state.index], seconds: elapsed });
   }
@@ -512,12 +548,15 @@
 
   function togglePause() {
     if (state.running) {
+      syncRemaining();        // freeze the exact value before the clock stops
       state.running = false;
+      state.deadline = null;
       stopTicker();
       el.pause.textContent = t("resume");
+      renderClock();
     } else {
       state.running = true;
-      startTicker();
+      startTicker();          // rebuilds the deadline from state.remaining
     }
   }
 
@@ -656,7 +695,7 @@
 
   el.theme.addEventListener("click", function () {
     var next = effectiveTheme() === "dark" ? "light" : "dark";
-    localStorage.setItem(LS_THEME, next);
+    lsSet(LS_THEME, next);
     applyTheme();
   });
   if (window.matchMedia) {
@@ -665,6 +704,12 @@
     if (mq.addEventListener) mq.addEventListener("change", onMq);
     else if (mq.addListener) mq.addListener(onMq);
   }
+
+  // Coming back to a throttled tab: catch the clock up immediately instead of
+  // waiting for the next (possibly long-delayed) interval callback.
+  document.addEventListener("visibilitychange", function () {
+    if (!document.hidden && state.running && !el.running.hidden) tick();
+  });
 
   el.lang.addEventListener("change", function () { setLang(el.lang.value); });
   el.names.addEventListener("input", refreshEstimate);
@@ -687,8 +732,11 @@
   el.again.addEventListener("click", resetToSetup);
 
   document.addEventListener("keydown", function (e) {
-    if (e.target && (e.target.tagName === "TEXTAREA" || e.target.tagName === "INPUT" ||
-      e.target.tagName === "SELECT" || e.target.tagName === "SUMMARY")) return;
+    var tag = e.target && e.target.tagName;
+    if (tag === "TEXTAREA" || tag === "INPUT" || tag === "SELECT" || tag === "SUMMARY") return;
+    // A focused button already activates on Space/Enter by itself; acting here
+    // too would fire the shortcut and the button's own click for one keypress.
+    if (tag === "BUTTON" && (e.code === "Space" || e.code === "Enter")) return;
 
     if (el.running.hidden) {
       if (e.code === "Space" && !el.start.disabled && !el.setup.hidden) { e.preventDefault(); startRun(); }
@@ -714,14 +762,14 @@
     buildLangPicker();
     applyTheme();
 
-    var savedNames = localStorage.getItem(LS_NAMES);
+    var savedNames = lsGet(LS_NAMES);
     if (savedNames) el.names.value = savedNames;
-    var savedMinutes = localStorage.getItem(LS_MINUTES);
+    var savedMinutes = lsGet(LS_MINUTES);
     if (savedMinutes) el.minutes.value = clampMinutes(savedMinutes);
-    setOrder(localStorage.getItem(LS_ORDER) === "alpha" ? "alpha" : "random");
-    setMode(localStorage.getItem(LS_MODE) === "manual" ? "manual" : "auto");
+    setOrder(lsGet(LS_ORDER) === "alpha" ? "alpha" : "random");
+    setMode(lsGet(LS_MODE) === "manual" ? "manual" : "auto");
 
-    var savedLang = localStorage.getItem(LS_LANG);
+    var savedLang = lsGet(LS_LANG);
     var navLang = (navigator.language || "").slice(0, 2).toLowerCase();
     setLang(savedLang || (I18N.has(navLang) ? navLang : FALLBACK));
 
