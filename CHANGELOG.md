@@ -1,0 +1,56 @@
+# Changelog
+
+All notable changes to this project are documented here.
+
+The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
+and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
+
+## [Unreleased]
+
+### Fixed
+
+- **The countdown no longer freezes in a background tab.** It was decrementing a
+  counter once per `setInterval` callback; browsers throttle those in hidden tabs
+  and stop them while the machine sleeps, so switching away mid stand-up silently
+  stalled the clock and skewed every recorded time by the same amount. The
+  countdown is now derived from a wall-clock deadline, catches up on
+  `visibilitychange`, and only ever advances one turn on return.
+- **Space no longer fires twice when a button has focus.** A focused button
+  already activates on Space/Enter, so a single keypress ran both the button and
+  the global shortcut: after clicking Pause with the mouse, Space appeared to stop
+  working (the two toggles cancelled out), and Space on a focused "Next" advanced
+  and paused at once. Arrow keys and `R` still work while a button has focus.
+- **The page no longer renders blank when `localStorage` is unavailable.** Reading
+  it throws in Safari private browsing and whenever site data is blocked, and the
+  first read happened during init, aborting the whole script. All access is now
+  guarded; preferences are simply not persisted in that case.
+
+## [1.0.0] - 2026-09-03
+
+First release.
+
+### Added
+
+- Rotating stand-up timer: equal speaking time per person, moving on when the
+  time runs out.
+- People list, minutes per person (0.5–10), alphabetical or random order
+  (Fisher–Yates), locked in at start.
+- Automatic or manual turn switching. Manual keeps counting into overtime
+  (`+M:SS`) until you press Next.
+- Five-second start countdown, skippable with any key or a click.
+- Colour-coded clock (green → amber → red → blinking overtime), turn progress
+  bar, participant queue, and estimated total.
+- WebAudio cues with no audio files: ticks during the countdown, a triple tone at
+  zero, a double tone at the end.
+- End summary with each person's actual time, the difference against the target,
+  and the total — plus a fireworks animation.
+- Five languages (Catalan, Spanish, English, French, Dutch), auto-detected from
+  the browser and remembered. One file per language, self-registering, so adding
+  or removing one is a file plus a `<script>` tag.
+- Light/dark theme toggle that follows the system until you pin a choice.
+- Collapsible help panel and keyboard shortcuts (`Space`, `→`, `R`).
+- Preferences persisted in `localStorage`; animations honour
+  `prefers-reduced-motion`.
+
+[Unreleased]: https://github.com/eballo/time-is-up/compare/v1.0.0...HEAD
+[1.0.0]: https://github.com/eballo/time-is-up/releases/tag/v1.0.0

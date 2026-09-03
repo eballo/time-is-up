@@ -7,6 +7,8 @@ stays short, balanced, and predictable.
 Static page: **no build, no dependencies, no backend**. Open it directly
 (`file://`) or serve it from any static host.
 
+**Live:** https://eballo.github.io/time-is-up/ · **Changes:** [CHANGELOG.md](CHANGELOG.md)
+
 ---
 
 ## Features
