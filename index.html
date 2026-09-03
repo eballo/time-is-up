@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Time is up</title>
+<link rel="stylesheet" href="src/css/styles.css">
+</head>
+<body>
+<div class="app">
+  <header class="title">
+    <h1><span class="tick" aria-hidden="true">⏱️</span> Time is up</h1>
+    <span class="tagline" id="tagline"></span>
+    <button type="button" class="theme" id="theme" aria-label="Toggle theme">🌙</button>
+    <!-- options are filled in by app.js from the registered languages -->
+    <select id="lang" aria-label="Language / Idioma"></select>
+  </header>
+
+  <!-- ============ SETUP ============ -->
+  <section id="setup" class="card">
+    <label for="names">
+      <span id="lbl-people"></span>
+      <span class="hint" id="lbl-people-hint"></span>
+    </label>
+    <textarea id="names"></textarea>
+
+    <div class="row">
+      <div class="field grow">
+        <label for="minutes" id="lbl-minutes"></label>
+        <input type="number" id="minutes" min="0.5" max="10" step="0.5" value="1.5">
+      </div>
+      <div class="field">
+        <label id="lbl-order"></label>
+        <div class="segmented" role="group" aria-labelledby="lbl-order">
+          <button type="button" id="order-alpha" aria-pressed="false"></button>
+          <button type="button" id="order-random" aria-pressed="true"></button>
+        </div>
+      </div>
+      <div class="field">
+        <label id="lbl-mode"></label>
+        <div class="segmented" role="group" aria-labelledby="lbl-mode">
+          <button type="button" id="mode-auto" aria-pressed="true"></button>
+          <button type="button" id="mode-manual" aria-pressed="false"></button>
+        </div>
+      </div>
+    </div>
+
+    <div class="btn-group">
+      <button class="btn primary" id="start" disabled></button>
+    </div>
+
+    <p class="meta" id="estimate"></p>
+
+    <details class="help" id="help">
+      <summary id="help-title"></summary>
+      <div id="help-text"></div>
+    </details>
+  </section>
+
+  <!-- ============ RUNNING ============ -->
+  <section id="running" class="card" hidden>
+    <div class="stage">
+      <div class="eyebrow" id="eyebrow"></div>
+      <div class="speaker" id="speaker">—</div>
+      <div class="clock" id="clock">1:30</div>
+      <div class="overtime-note" id="overtime-note" hidden></div>
+
+      <div class="progress" id="turnbar"><i></i></div>
+      <div class="progress-label">
+        <span id="turn-count"></span>
+        <span id="next-up"></span>
+      </div>
+
+      <ol class="queue" id="queue"></ol>
+
+      <div class="preroll" id="preroll" hidden>
+        <div class="preroll-label" id="preroll-label"></div>
+        <div class="preroll-num" id="preroll-num"></div>
+        <div class="preroll-skip" id="preroll-skip"></div>
+      </div>
+    </div>
+
+    <div class="btn-group">
+      <button class="btn primary" id="pause"></button>
+      <button class="btn" id="next"></button>
+      <button class="btn" id="reset"></button>
+    </div>
+  </section>
+
+  <!-- ============ DONE ============ -->
+  <section id="done" class="card" hidden>
+    <div class="done-banner">
+      <div class="big" id="done-title"></div>
+      <div class="sub" id="done-sub"></div>
+    </div>
+    <ol class="summary" id="summary"></ol>
+    <div class="btn-group" style="justify-content:center;">
+      <button class="btn primary" id="again"></button>
+    </div>
+  </section>
+</div>
+
+<canvas id="fireworks" hidden></canvas>
+
+<!-- i18n: registry first, then one file per language.
+     Add a language  -> new src/i18n/<code>.js + a <script> line here.
+     Remove a language -> delete the file + its <script> line. -->
+<script src="src/i18n/registry.js"></script>
+<script src="src/i18n/ca.js"></script>
+<script src="src/i18n/es.js"></script>
+<script src="src/i18n/en.js"></script>
+<script src="src/i18n/fr.js"></script>
+<script src="src/i18n/nl.js"></script>
+
+<!-- app logic -->
+<script src="src/js/app.js"></script>
+</body>
+</html>
