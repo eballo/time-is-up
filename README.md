@@ -91,6 +91,9 @@ can get set, and the forward button becomes **Skip rest**.
 - **Accessibility**: turn changes are announced to screen readers, the clock is
   a `role="timer"` that does not read out every second, and the countdown,
   fireworks and animations honour `prefers-reduced-motion`.
+- **Link previews**: sharing the URL renders a card built from the app's own
+  clock ([`og-image.png`](og-image.png)), with Open Graph, Twitter and
+  `WebApplication` structured data behind it.
 
 ### Persistence
 

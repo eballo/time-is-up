@@ -36,6 +36,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   with the repository. The version is a hand-maintained constant in
   `src/js/version.js`; the README says what has to be kept in step with it.
 
+- **Link previews and search metadata.** Sharing the URL on WhatsApp, Slack or
+  social used to produce a bare text card; it now carries a 1200×630 preview
+  built from the app's own clock, plus Open Graph and Twitter tags, a canonical
+  URL, a descriptive `<title>` and `WebApplication` structured data. The image
+  is a PNG, not the site's SVG, because WhatsApp will not render SVG, and the
+  URLs are absolute, because scrapers do not resolve relative ones.
 - **A test suite** for the parts that fail silently — the session model, the
   time formatting, the preference clamps and the upgrade path, the translator
   fallback, and the parity of keys and placeholders across all five languages.
