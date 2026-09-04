@@ -23,6 +23,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   own line, then the total — so where the time went is all on one screen.
 - Training labels the automatic/manual control **Activity switching**: a workout
   is not changing person.
+- **The end of a session sounds like fireworks** rather than two more of the same
+  beeps the app uses everywhere else — rockets that rise and burst, matching the
+  animation on screen. The countdown and time's-up cues are unchanged; only the
+  moment the whole thing finishes got its own sound.
 
 ### Changed
 

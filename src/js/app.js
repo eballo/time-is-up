@@ -173,7 +173,7 @@ export class App {
     this.#wakeLock.release();
     this.#tabTitle.reset();
     this.#summaryScreen.render(this.#session, this.#setupScreen.mode);
-    this.#chime.standupFinished();
+    this.#chime.sessionFinished();
     this.#showScreen(SCREEN.summary);
     this.#fireworks.launch();
   }
