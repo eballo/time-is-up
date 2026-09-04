@@ -36,6 +36,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   with the repository. The version is a hand-maintained constant in
   `src/js/version.js`; the README says what has to be kept in step with it.
 
+- **A test suite** for the parts that fail silently — the session model, the
+  time formatting, the preference clamps and the upgrade path, the translator
+  fallback, and the parity of keys and placeholders across all five languages.
+  100 tests on Node's own runner: no dependencies, no build, `node --test`.
+  They are excluded from release archives.
+
 ### Changed
 
 - `StandupRun` becomes `Session`: a sequence of timed segments. A stand-up is

@@ -163,6 +163,40 @@ loading over `file://`.
 
 ---
 
+## Tests
+
+```sh
+node --test
+```
+
+No dependencies and no build — Node's own test runner, importing the source
+modules directly. Still 100% of what the app needs to run: the tests are
+excluded from release archives.
+
+They cover the parts that are worth covering — the ones that fail *silently*:
+
+- **`core/session.js`** — segment order, that a workout ends on an exercise and
+  not a trailing rest, that a rest of `0` collapses away, queue statuses during
+  a rest, and that worked + rest = total, since the summary shows all three.
+- **`util/time-format.js`** — the overtime `+`, the real minus sign in a
+  negative delta, the one-second tolerance around the target, decimal
+  separators per locale.
+- **`services/preferences.js`** — the clamps, and that the `"alpha"` order value
+  written by earlier versions is still understood, since getting that wrong
+  resets someone's setting on upgrade. Also the hostile-storage path that once
+  rendered a blank page.
+- **`services/translator.js`** — the two-step fallback, so a half-translated
+  language degrades to English rather than to blanks.
+- **`src/i18n/`** — that every language carries the same keys with the same
+  placeholders, and that the template still produces a complete language.
+
+Deliberately **not** covered: anything that needs a browser. The layout, the
+CSS states and the timing bugs found during development were all visual, and a
+DOM stub has no layout engine to catch them with. Those are verified by driving
+a real browser instead.
+
+---
+
 ## Adding a language (short version)
 
 ```sh
