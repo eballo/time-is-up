@@ -32,6 +32,10 @@ export class RunningScreen {
   renderText() {
     this.#elements.overtimeNote.textContent = this.#translator.translate("overtimeNote");
     this.#elements.reset.textContent = this.#translator.translate("reset");
+    // A run always opens on something that is not a rest. Without this the
+    // button sits blank all through the count-in, which happens before the
+    // first segment is ever rendered.
+    this.renderNextButton(false);
   }
 
   /** Label the pause button for what pressing it would do. */
@@ -110,6 +114,7 @@ export class RunningScreen {
   /** Show the stage behind the count-in overlay before the clock starts. */
   primeFor(session) {
     const el = this.#elements;
+    this.renderNextButton(session.isResting);
     el.speaker.textContent = session.currentLabel;
     el.clock.textContent = formatCountdown(session.currentSeconds);
     el.clock.className = "clock";
