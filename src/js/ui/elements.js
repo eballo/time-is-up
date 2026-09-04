@@ -79,6 +79,7 @@ export function collectElements() {
     },
 
     version: byId("version"),
+    share: byId("share"),
     fireworksCanvas: byId("fireworks")
   };
 }

@@ -31,8 +31,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **An MIT licence.** Without one the code was "all rights reserved" by default,
   so nobody could legally reuse it even though the repository is public. MIT
   matches the intent: use it freely, keep the attribution.
-- A colophon at the foot of the page — `v1.2.0 · © 2026 Enric Ballo · MIT ·
-  GitHub` — so the version and the attribution travel with the page and not only
+- A colophon at the foot of the page — `Share · v1.1.0 · © 2026 Enric Ballo ·
+  MIT · GitHub` — so the version and the attribution travel with the page and not only
   with the repository. The version is a hand-maintained constant in
   `src/js/version.js`; the README says what has to be kept in step with it.
 

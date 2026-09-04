@@ -1,8 +1,12 @@
 /*
- * The released version, shown in the colophon.
+ * The last released version, shown in the colophon.
  *
- * There is no build step to derive this from, so it lives here on its own and
- * has to be bumped by hand when cutting a release. Three things must agree:
- * this constant, the heading in CHANGELOG.md, and the git tag.
+ * It is the version that was last tagged — not the one in progress. Between
+ * releases the deployed site is therefore "this version plus whatever came
+ * after", which is the honest reading of a continuously deployed main.
+ *
+ * Do not edit by hand: `node scripts/release.mjs <patch|minor|major>` sets this,
+ * the CHANGELOG heading and the git tag together, which is the only way the
+ * three stay in step.
  */
-export const APP_VERSION = "1.2.0";
+export const APP_VERSION = "1.1.0";

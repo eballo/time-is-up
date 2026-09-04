@@ -40,6 +40,8 @@ export default {
     doneSub: "{people} · {total} in total · target {target} per person",
     total: "Total",
     restart: "Start again",
+    share: "Share",
+    shareCopied: "Link copied",
 
     getReady: "Get ready",
     prerollSkip: "Press any key to start now",
@@ -49,7 +51,8 @@ export default {
       "Time is up is a rotating timer for stand-ups (dailies): it gives everyone the same time to speak, so the meeting stays short and balanced.\n" +
       "Type the names, pick the minutes per person and the order (alphabetical or random), then press Start. A 5-second countdown runs before the first person.\n" +
       "In Automatic mode it moves to the next person on its own when time runs out; in Manual mode it just sounds the alert and you decide when to continue.\n" +
-      "At the end you see how long each person spoke and the total. Shortcuts: Space pauses, Right arrow next, R resets.",
+      "At the end you see how long each person spoke and the total. Shortcuts: Space pauses, Right arrow next, R resets.\n" +
+      "Your settings (names, minutes, language and theme) are kept in your own browser using localStorage, not cookies. Nothing leaves your device: no accounts, no server, no tracking.",
 
     /* training mode */
     modeLabel: "Mode",

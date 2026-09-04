@@ -8,3 +8,6 @@
 
 # Local dev
 *.log
+
+# Written by scripts/release.mjs, consumed by the release workflow
+RELEASE_NOTES.md

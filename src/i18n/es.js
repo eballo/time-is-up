@@ -40,6 +40,8 @@ export default {
     doneSub: "{people} · {total} en total · objetivo {target} por persona",
     total: "Total",
     restart: "Volver a empezar",
+    share: "Compartir",
+    shareCopied: "Enlace copiado",
 
     getReady: "Preparados",
     prerollSkip: "Pulsa una tecla para empezar ya",
@@ -49,7 +51,8 @@ export default {
       "Time is up es un cronómetro rotativo para los stand-ups (dailies): da a cada persona el mismo tiempo para hablar, así la reunión es corta y equilibrada.\n" +
       "Escribe los nombres, elige los minutos por persona y el orden (alfabético o aleatorio) y pulsa Empezar. Hay una cuenta atrás de 5 segundos antes de la primera persona.\n" +
       "En modo Automático se pasa solo a la siguiente persona cuando se acaba el tiempo; en modo Manual suena el aviso y tú decides cuándo continuar.\n" +
-      "Al final verás cuánto ha hablado cada persona y el total. Atajos: Espacio pausa, Flecha derecha siguiente, R reinicia.",
+      "Al final verás cuánto ha hablado cada persona y el total. Atajos: Espacio pausa, Flecha derecha siguiente, R reinicia.\n" +
+      "La configuración (nombres, minutos, idioma y tema) se guarda en tu navegador con localStorage, no con cookies. No sale de tu dispositivo: ni cuentas, ni servidor, ni seguimiento.",
 
     /* training mode */
     modeLabel: "Modo",

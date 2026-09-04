@@ -63,6 +63,8 @@ export default {
     doneSub: "{people} · {total} in total · target {target} per person",
     total: "Total",
     restart: "Start again",
+    share: "Share",
+    shareCopied: "Link copied",
 
     /* pre-roll countdown, theme button, help panel */
     getReady: "Get ready",
@@ -74,7 +76,8 @@ export default {
       "Time is up is a rotating timer for stand-ups: everyone gets the same time to speak.\n" +
       "Type the names, pick minutes per person and the order, then press Start.\n" +
       "Automatic mode moves on by itself; Manual mode waits for you to press Next.\n" +
-      "At the end you see each person's time and the total.",
+      "At the end you see each person's time and the total.\n" +
+      "Your settings are kept in your own browser using localStorage, not cookies. Nothing leaves your device: no accounts, no server, no tracking.",
 
     /* ---- training mode ---- */
     modeLabel: "Mode",

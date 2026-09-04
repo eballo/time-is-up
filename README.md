@@ -237,18 +237,28 @@ It is a static page — any host works (GitHub Pages, Netlify, an S3 bucket…).
 
 ## Releasing
 
-There is no build step, so the version is a hand-maintained constant. Three
-things have to agree, and nothing checks them for you:
+Run the **release** workflow from the Actions tab and pick `patch`, `minor` or
+`major`. How big the change is stays a human decision; everything after it is
+mechanical, so it is automated:
 
-1. `APP_VERSION` in [`src/js/version.js`](src/js/version.js) — this is what the
-   colophon shows.
-2. The heading in [`CHANGELOG.md`](CHANGELOG.md), with `[Unreleased]` renamed to
-   the new version and dated.
-3. The git tag, `vX.Y.Z`.
+1. the tests run, and nothing ships if they fail;
+2. `APP_VERSION` in [`src/js/version.js`](src/js/version.js) is bumped;
+3. `[Unreleased]` in [`CHANGELOG.md`](CHANGELOG.md) is closed under the new
+   version and dated, with a fresh empty section left behind;
+4. the commit and the `vX.Y.Z` tag are pushed, attributed to whoever pressed the
+   button;
+5. the GitHub release is published with that changelog section as its notes.
 
-Then create the GitHub release from the tag. Pages redeploys from `main` on its
-own; the release archive carries `index.html`, `favicon.svg`, `LICENSE` and
-`src/` — the docs are stripped by `.gitattributes`.
+Locally, `node scripts/release.mjs minor --dry-run` shows what it would do.
+
+`APP_VERSION` records the **last released** version, not the one in progress, so
+between releases the deployed site reads as "this version plus whatever came
+after". Do not edit it by hand — that is what drifts.
+
+Pages is not deployed by any workflow: the site is served from the `main`
+branch, so merging publishes it. The release archive carries `index.html`,
+`favicon.svg`, `og-image.png`, `LICENSE` and `src/`; docs, tests, scripts and
+CI config are stripped by `.gitattributes`.
 
 ---
 

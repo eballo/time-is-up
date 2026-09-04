@@ -22,6 +22,7 @@ import { KeyboardShortcuts, SCREEN } from "./ui/keyboard-shortcuts.js";
 import { PrerollCountdown } from "./ui/preroll-countdown.js";
 import { RunningScreen } from "./ui/running-screen.js";
 import { SetupScreen, MODE } from "./ui/setup-screen.js";
+import { ShareButton } from "./ui/share-button.js";
 import { SummaryScreen } from "./ui/summary-screen.js";
 import { TabTitle } from "./ui/tab-title.js";
 
@@ -46,6 +47,7 @@ export class App {
   #summaryScreen;
   #preroll;
   #fireworks;
+  #share;
   #timer;
 
   #session = null;
@@ -85,6 +87,11 @@ export class App {
     });
 
     this.#fireworks = new Fireworks(this.#elements.fireworksCanvas);
+
+    this.#share = new ShareButton({
+      button: this.#elements.share,
+      translator: this.#translator
+    });
 
     this.#timer = new TurnTimer({
       onSecondChanged: (remaining) => this.#onSecondChanged(remaining),
@@ -265,6 +272,7 @@ export class App {
     this.#runningScreen.renderPauseButton(this.#session !== null && !this.#timer.isRunning);
     this.#preroll.renderText();
     this.#summaryScreen.renderText();
+    this.#share.renderText();
 
     if (this.#screen === SCREEN.running) {
       this.#runningScreen.renderSegment(this.#session, this.#viewOptions);
