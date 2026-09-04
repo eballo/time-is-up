@@ -1,0 +1,10 @@
+{
+  "name": "time-is-up",
+  "private": true,
+  "type": "module",
+  "description": "A rotating timer for stand-ups and workouts.",
+  "license": "MIT",
+  "scripts": {
+    "test": "node --test"
+  }
+}

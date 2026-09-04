@@ -1,5 +1,10 @@
 # ⏱️ Time is up
 
+[![tests](https://img.shields.io/github/actions/workflow/status/eballo/time-is-up/tests.yml?branch=main&style=flat-square&label=tests)](https://github.com/eballo/time-is-up/actions/workflows/tests.yml)
+[![release](https://img.shields.io/github/v/release/eballo/time-is-up?style=flat-square&color=2f6feb)](https://github.com/eballo/time-is-up/releases)
+[![licence](https://img.shields.io/github/license/eballo/time-is-up?style=flat-square)](LICENSE)
+![dependencies](https://img.shields.io/badge/dependencies-none-brightgreen?style=flat-square)
+
 A rotating timer with two modes.
 
 - **Stand-up** — everyone gets the same time to speak, and it moves on when the
@@ -166,12 +171,16 @@ loading over `file://`.
 ## Tests
 
 ```sh
-node --test
+node --test      # or: npm test
 ```
 
-No dependencies and no build — Node's own test runner, importing the source
-modules directly. Still 100% of what the app needs to run: the tests are
-excluded from release archives.
+Node's own test runner, importing the source modules directly. There is nothing
+to install — `package.json` carries no dependencies; it exists only to declare
+the modules as ESM and to name the test script. Every push and pull request runs
+the suite on [CI](.github/workflows/tests.yml).
+
+The tests, the workflow and `package.json` are all excluded from release
+archives: what ships is the app.
 
 They cover the parts that are worth covering — the ones that fail *silently*:
 

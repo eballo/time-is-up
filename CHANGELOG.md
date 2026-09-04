@@ -39,8 +39,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **A test suite** for the parts that fail silently — the session model, the
   time formatting, the preference clamps and the upgrade path, the translator
   fallback, and the parity of keys and placeholders across all five languages.
-  100 tests on Node's own runner: no dependencies, no build, `node --test`.
-  They are excluded from release archives.
+  100 tests on Node's own runner: nothing to install, `node --test`. Every push
+  and pull request runs them on GitHub Actions, so the README's test badge
+  reflects the real state rather than decorating it. The tests, the workflow and
+  `package.json` — which carries no dependencies and exists only to declare ESM
+  and the test script — are all excluded from release archives.
 
 ### Changed
 
