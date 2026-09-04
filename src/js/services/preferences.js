@@ -1,5 +1,9 @@
 const KEYS = {
+  mode: "tiu.appMode",
   names: "tiu.names",
+  exercises: "tiu.exercises",
+  minutesPerExercise: "tiu.exerciseMinutes",
+  restSeconds: "tiu.rest",
   minutes: "tiu.minutes",
   order: "tiu.order",
   switchMode: "tiu.mode",
@@ -11,11 +15,22 @@ export const MIN_MINUTES_PER_PERSON = 0.5;
 export const MAX_MINUTES_PER_PERSON = 10;
 export const DEFAULT_MINUTES_PER_PERSON = 1.5;
 
+export const MIN_REST_SECONDS = 0;
+export const MAX_REST_SECONDS = 300;
+export const DEFAULT_REST_SECONDS = 30;
+
 /** Keep a typed minutes value inside the range the input allows. */
 export function clampMinutesPerPerson(value) {
   const parsed = Number.parseFloat(value);
   const safe = Number.isNaN(parsed) || parsed <= 0 ? DEFAULT_MINUTES_PER_PERSON : parsed;
   return Math.min(MAX_MINUTES_PER_PERSON, Math.max(MIN_MINUTES_PER_PERSON, safe));
+}
+
+/** Rest is short enough to think about in seconds; 0 means straight through. */
+export function clampRestSeconds(value) {
+  const parsed = Number.parseInt(value, 10);
+  const safe = Number.isNaN(parsed) || parsed < 0 ? DEFAULT_REST_SECONDS : parsed;
+  return Math.min(MAX_REST_SECONDS, Math.max(MIN_REST_SECONDS, safe));
 }
 
 /**
@@ -43,6 +58,15 @@ export class Preferences {
     }
   }
 
+  /** "standup" | "training" */
+  get mode() {
+    return this.#read(KEYS.mode) === "training" ? "training" : "standup";
+  }
+
+  set mode(value) {
+    this.#write(KEYS.mode, value);
+  }
+
   get names() {
     return this.#read(KEYS.names) ?? "";
   }
@@ -58,6 +82,32 @@ export class Preferences {
 
   set minutesPerPerson(value) {
     this.#write(KEYS.minutes, String(clampMinutesPerPerson(value)));
+  }
+
+  get exercises() {
+    return this.#read(KEYS.exercises) ?? "";
+  }
+
+  set exercises(value) {
+    this.#write(KEYS.exercises, value);
+  }
+
+  get minutesPerExercise() {
+    const stored = this.#read(KEYS.minutesPerExercise);
+    return stored === null ? null : clampMinutesPerPerson(stored);
+  }
+
+  set minutesPerExercise(value) {
+    this.#write(KEYS.minutesPerExercise, String(clampMinutesPerPerson(value)));
+  }
+
+  get restSeconds() {
+    const stored = this.#read(KEYS.restSeconds);
+    return stored === null ? null : clampRestSeconds(stored);
+  }
+
+  set restSeconds(value) {
+    this.#write(KEYS.restSeconds, String(clampRestSeconds(value)));
   }
 
   /** "alphabetical" | "random". "alpha" is what versions up to 1.0.1 wrote. */

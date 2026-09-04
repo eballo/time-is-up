@@ -7,6 +7,60 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+- **A training mode**, alongside the stand-up the app already did. It runs the
+  same clock over a list of exercises with a configurable rest between them,
+  which you can cut short with **Skip rest** whenever you're ready. Two tabs at
+  the top of the setup screen switch between the modes; each keeps its own list,
+  duration and settings, so moving between them never costs you what you typed.
+- Training carries **its own accent** so the two modes are distinguishable
+  across a room, and a **rest is kept off the green→amber→red ramp** entirely:
+  it gets a cool colour of its own, because running out of rest is not something
+  to warn anyone about. A rest says so in the headline, with the exercise you
+  are getting ready for on the line below it.
+- The training summary lists the exercises, then the time spent resting as its
+  own line, then the total — so where the time went is all on one screen.
+- Training labels the automatic/manual control **Activity switching**: a workout
+  is not changing person.
+- **The end of a session sounds like fireworks** rather than two more of the same
+  beeps the app uses everywhere else — rockets that rise and burst, matching the
+  animation on screen. The countdown and time's-up cues are unchanged; only the
+  moment the whole thing finishes got its own sound.
+
+- **An MIT licence.** Without one the code was "all rights reserved" by default,
+  so nobody could legally reuse it even though the repository is public. MIT
+  matches the intent: use it freely, keep the attribution.
+- A colophon at the foot of the page — `Share · v1.1.0 · © 2026 Enric Ballo ·
+  MIT · GitHub` — so the version and the attribution travel with the page and not only
+  with the repository. The version is a hand-maintained constant in
+  `src/js/version.js`; the README says what has to be kept in step with it.
+
+- **Link previews and search metadata.** Sharing the URL on WhatsApp, Slack or
+  social used to produce a bare text card; it now carries a 1200×630 preview
+  built from the app's own clock, plus Open Graph and Twitter tags, a canonical
+  URL, a descriptive `<title>` and `WebApplication` structured data. The image
+  is a PNG, not the site's SVG, because WhatsApp will not render SVG, and the
+  URLs are absolute, because scrapers do not resolve relative ones.
+- **A test suite** for the parts that fail silently — the session model, the
+  time formatting, the preference clamps and the upgrade path, the translator
+  fallback, and the parity of keys and placeholders across all five languages.
+  100 tests on Node's own runner: nothing to install, `node --test`. Every push
+  and pull request runs them on GitHub Actions, so the README's test badge
+  reflects the real state rather than decorating it. The tests, the workflow and
+  `package.json` — which carries no dependencies and exists only to declare ESM
+  and the test script — are all excluded from release archives.
+
+### Changed
+
+- `StandupRun` becomes `Session`: a sequence of timed segments. A stand-up is
+  one segment per person; a workout alternates exercise and rest and drops the
+  trailing rest, so the session ends on the last exercise rather than a rest
+  nobody asked for. Both modes now share the turn-taking, and neither carries a
+  copy of it.
+- The clock's class attribute is only rewritten when its state actually changes,
+  rather than four times a second on every tick.
+
 ## [1.1.0] - 2026-09-03
 
 ### Added

@@ -1,0 +1,64 @@
+#
+# Cutting a release is mechanical once you have decided how big the change is.
+# The deciding stays with a person — which is why this is a button and not a
+# push trigger — and everything after it is automated, because keeping
+# APP_VERSION, the CHANGELOG heading and the tag in step by hand is exactly the
+# kind of thing that drifts.
+#
+# GitHub Pages is not deployed from here: the site is served from the main
+# branch, so merging already publishes it.
+#
+name: release
+
+on:
+  workflow_dispatch:
+    inputs:
+      level:
+        description: How big is this release?
+        type: choice
+        options: [patch, minor, major]
+        default: minor
+        required: true
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: lts/*
+
+      # Nothing ships without a green suite.
+      - name: Run the tests
+        run: node --test
+
+      - name: Bump the version and close the changelog section
+        id: bump
+        run: node scripts/release.mjs "${{ inputs.level }}"
+
+      # Attributed to whoever pressed the button, so a bot never appears in the
+      # repository's contributor list.
+      - name: Commit and tag
+        env:
+          VERSION: ${{ steps.bump.outputs.version }}
+        run: |
+          git config user.name  "${{ github.actor }}"
+          git config user.email "${{ github.actor_id }}+${{ github.actor }}@users.noreply.github.com"
+          git add src/js/version.js CHANGELOG.md
+          git commit -m "Release ${VERSION}"
+          git tag -a "v${VERSION}" -m "Time is up v${VERSION}"
+          git push origin HEAD:main
+          git push origin "v${VERSION}"
+
+      - name: Publish the GitHub release
+        env:
+          GH_TOKEN: ${{ github.token }}
+          VERSION: ${{ steps.bump.outputs.version }}
+        run: gh release create "v${VERSION}" --title "v${VERSION}" --notes-file RELEASE_NOTES.md

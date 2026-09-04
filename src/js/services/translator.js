@@ -68,8 +68,16 @@ export class Translator {
 
   /** "1 person" / "5 people", in the active language. */
   countPeople(count) {
-    const noun = this.translate(count === 1 ? "personOne" : "personOther");
-    return `${count} ${noun}`;
+    return this.#count(count, "personOne", "personOther");
+  }
+
+  /** "1 exercise" / "4 exercises", in the active language. */
+  countExercises(count) {
+    return this.#count(count, "exerciseOne", "exerciseOther");
+  }
+
+  #count(count, singularKey, pluralKey) {
+    return `${count} ${this.translate(count === 1 ? singularKey : pluralKey)}`;
   }
 
   /** The per-person budget, formatted for the active locale. */

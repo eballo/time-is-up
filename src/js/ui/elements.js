@@ -22,10 +22,20 @@ export function collectElements() {
     },
 
     setup: {
-      names: byId("names"),
+      modeStandup: byId("mode-standup"),
+      modeTraining: byId("mode-training"),
+      modeStandupLabel: byId("mode-standup-label"),
+      modeTrainingLabel: byId("mode-training-label"),
+      modeGroup: byId("lbl-modes"),
+      entries: byId("names"),
+      restField: byId("field-rest"),
+      rest: byId("rest"),
+      restLabel: byId("lbl-rest"),
+      restHint: byId("rest-hint"),
+      orderField: byId("field-order"),
       minutes: byId("minutes"),
-      peopleLabel: byId("lbl-people"),
-      peopleHint: byId("lbl-people-hint"),
+      entriesLabel: byId("lbl-people"),
+      entriesHint: byId("lbl-people-hint"),
       minutesLabel: byId("lbl-minutes"),
       orderLabel: byId("lbl-order"),
       orderAlphabetical: byId("order-alpha"),
@@ -68,6 +78,8 @@ export function collectElements() {
       again: byId("again")
     },
 
+    version: byId("version"),
+    share: byId("share"),
     fireworksCanvas: byId("fireworks")
   };
 }

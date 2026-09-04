@@ -3,11 +3,49 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Time is up</title>
-<meta name="description" content="A rotating timer for stand-ups: everyone gets the same time to speak, with automatic or manual turn switching and a per-person summary at the end.">
+<title>Time is up — timer for stand-ups and workouts</title>
+<meta name="description" content="A rotating timer for stand-ups and workouts. Everyone gets the same time to speak, or run a list of exercises with rest in between. Five languages, no sign-up.">
+<link rel="canonical" href="https://eballo.github.io/time-is-up/">
 <!-- kept in sync with the active theme by app.js -->
 <meta name="theme-color" id="theme-color" content="#f4f5f7">
 <link rel="icon" href="favicon.svg" type="image/svg+xml">
+
+<!-- Link previews. Absolute URLs: scrapers do not resolve relative ones, and
+     the image is a raster because WhatsApp will not render an SVG. -->
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Time is up">
+<meta property="og:title" content="Time is up">
+<meta property="og:description" content="Everyone gets the same time to speak, or run a list of exercises with rest in between. Free, no sign-up, five languages.">
+<meta property="og:url" content="https://eballo.github.io/time-is-up/">
+<meta property="og:image" content="https://eballo.github.io/time-is-up/og-image.png">
+<meta property="og:image:type" content="image/png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="A large countdown reading 1:30 above the line: everyone gets the same time to speak.">
+<meta property="og:locale" content="en">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Time is up">
+<meta name="twitter:description" content="Everyone gets the same time to speak, or run a list of exercises with rest in between. Free, no sign-up, five languages.">
+<meta name="twitter:image" content="https://eballo.github.io/time-is-up/og-image.png">
+<meta name="twitter:image:alt" content="A large countdown reading 1:30 above the line: everyone gets the same time to speak.">
+
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "WebApplication",
+  "name": "Time is up",
+  "url": "https://eballo.github.io/time-is-up/",
+  "description": "A rotating timer for stand-ups and workouts. Everyone gets the same time to speak, or run a list of exercises with rest in between.",
+  "applicationCategory": "ProductivityApplication",
+  "operatingSystem": "Any",
+  "browserRequirements": "Requires JavaScript",
+  "inLanguage": ["ca", "es", "en", "fr", "nl"],
+  "isAccessibleForFree": true,
+  "offers": { "@type": "Offer", "price": "0", "priceCurrency": "EUR" },
+  "author": { "@type": "Person", "name": "Enric Ballo" },
+  "license": "https://opensource.org/licenses/MIT"
+}
+</script>
 <link rel="stylesheet" href="src/css/styles.css">
 </head>
 <body>
@@ -25,6 +63,29 @@
 
   <!-- ============ SETUP ============ -->
   <section id="setup" class="card">
+    <div class="modes" role="group" id="lbl-modes" aria-label="Mode">
+      <button type="button" class="mode-tab" id="mode-standup" aria-pressed="true">
+        <svg class="mode-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+             stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <circle cx="9" cy="8" r="3.1"/>
+          <path d="M3.4 19.2a5.6 5.6 0 0 1 11.2 0"/>
+          <circle cx="17.4" cy="9.2" r="2.3"/>
+          <path d="M16.4 14.4a4.7 4.7 0 0 1 4.2 4.5"/>
+        </svg>
+        <span id="mode-standup-label"></span>
+      </button>
+      <button type="button" class="mode-tab" id="mode-training" aria-pressed="false">
+        <svg class="mode-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+             stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <path d="M7.5 12h9"/>
+          <rect x="4" y="8.4" width="3.4" height="7.2" rx="1.1"/>
+          <rect x="16.6" y="8.4" width="3.4" height="7.2" rx="1.1"/>
+          <path d="M2 10.6v2.8M22 10.6v2.8"/>
+        </svg>
+        <span id="mode-training-label"></span>
+      </button>
+    </div>
+
     <label for="names">
       <span id="lbl-people"></span>
       <span class="hint" id="lbl-people-hint"></span>
@@ -36,7 +97,14 @@
         <label for="minutes" id="lbl-minutes"></label>
         <input type="number" id="minutes" min="0.5" max="10" step="0.5" value="1.5">
       </div>
-      <div class="field">
+      <div class="field" id="field-rest" hidden>
+        <label for="rest">
+          <span id="lbl-rest"></span>
+          <span class="hint" id="rest-hint"></span>
+        </label>
+        <input type="number" id="rest" min="0" max="300" step="5" value="30">
+      </div>
+      <div class="field" id="field-order">
         <span class="fieldlabel" id="lbl-order"></span>
         <div class="segmented" role="group" aria-labelledby="lbl-order">
           <button type="button" id="order-alpha" aria-pressed="false"></button>
@@ -105,6 +173,18 @@
       <button class="btn primary" id="again"></button>
     </div>
   </section>
+
+  <!-- Attribution travels with the page, not only with the repository. -->
+  <footer class="colophon">
+    <button type="button" id="share"></button> &middot;
+    <a id="version" href="https://github.com/eballo/time-is-up/releases"
+       target="_blank" rel="noopener noreferrer"></a> &middot;
+    &copy; 2026 Enric Ballo &middot;
+    <a href="https://github.com/eballo/time-is-up/blob/main/LICENSE"
+       target="_blank" rel="noopener noreferrer">MIT</a> &middot;
+    <a href="https://github.com/eballo/time-is-up"
+       target="_blank" rel="noopener noreferrer">GitHub</a>
+  </footer>
 </div>
 
 <canvas id="fireworks" hidden></canvas>
