@@ -5,6 +5,8 @@
 [![licence](https://img.shields.io/github/license/eballo/time-is-up?style=flat-square)](LICENSE)
 ![dependencies](https://img.shields.io/badge/dependencies-none-brightgreen?style=flat-square)
 
+[![A large countdown reading 1:30, above the line: everyone gets the same time to speak. Stand-ups and workouts, five languages, no sign-up.](og-image.png)](https://eballo.github.io/time-is-up/)
+
 A rotating timer with two modes.
 
 - **Stand-up** — everyone gets the same time to speak, and it moves on when the
