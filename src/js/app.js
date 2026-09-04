@@ -27,6 +27,7 @@ import { TabTitle } from "./ui/tab-title.js";
 
 import { createElement } from "./util/dom.js";
 import { minutesToSeconds } from "./util/time-format.js";
+import { APP_VERSION } from "./version.js";
 
 /** A turn ends one second past zero, leaving the overtime visible for a beat. */
 const OVERTIME_GRACE_SECONDS = -1;
@@ -94,6 +95,7 @@ export class App {
   }
 
   start() {
+    this.#elements.version.textContent = `v${APP_VERSION}`;
     this.#buildLanguagePicker();
     this.#theme.apply();
     this.#applyMode(this.#setupScreen.mode);

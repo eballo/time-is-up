@@ -189,6 +189,23 @@ It is a static page — any host works (GitHub Pages, Netlify, an S3 bucket…).
 
 ---
 
+## Releasing
+
+There is no build step, so the version is a hand-maintained constant. Three
+things have to agree, and nothing checks them for you:
+
+1. `APP_VERSION` in [`src/js/version.js`](src/js/version.js) — this is what the
+   colophon shows.
+2. The heading in [`CHANGELOG.md`](CHANGELOG.md), with `[Unreleased]` renamed to
+   the new version and dated.
+3. The git tag, `vX.Y.Z`.
+
+Then create the GitHub release from the tag. Pages redeploys from `main` on its
+own; the release archive carries `index.html`, `favicon.svg`, `LICENSE` and
+`src/` — the docs are stripped by `.gitattributes`.
+
+---
+
 ## Licence
 
 [MIT](LICENSE) — use it, change it, ship it, commercially or not. The one

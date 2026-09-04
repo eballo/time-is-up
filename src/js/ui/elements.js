@@ -78,6 +78,7 @@ export function collectElements() {
       again: byId("again")
     },
 
+    version: byId("version"),
     fireworksCanvas: byId("fireworks")
   };
 }
