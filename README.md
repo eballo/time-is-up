@@ -186,3 +186,12 @@ one: delete the file and both of its lines. Full details and the key reference a
 
 It is a static page — any host works (GitHub Pages, Netlify, an S3 bucket…). For
 **GitHub Pages**, enable Pages on the `main` branch / root.
+
+---
+
+## Licence
+
+[MIT](LICENSE) — use it, change it, ship it, commercially or not. The one
+condition is that the copyright notice travels with it.
+
+© 2026 Enric Ballo

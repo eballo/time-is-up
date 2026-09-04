@@ -28,6 +28,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   animation on screen. The countdown and time's-up cues are unchanged; only the
   moment the whole thing finishes got its own sound.
 
+- **An MIT licence.** Without one the code was "all rights reserved" by default,
+  so nobody could legally reuse it even though the repository is public. MIT
+  matches the intent: use it freely, keep the attribution.
+- A colophon at the foot of the page — `© 2026 Enric Ballo · MIT · GitHub` — so
+  the attribution travels with the page and not only with the repository.
+
 ### Changed
 
 - `StandupRun` becomes `Session`: a sequence of timed segments. A stand-up is
