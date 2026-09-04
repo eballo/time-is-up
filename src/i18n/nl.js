@@ -55,6 +55,7 @@ export default {
     modeLabel: "Modus",
     modeStandup: "Stand-up",
     modeTraining: "Training",
+    changeModeTraining: "Wisselen van oefening",
     exercises: "Oefeningen",
     exercisesHint: "— één per regel, in de volgorde die je aanhoudt.",
     exercisesPlaceholder: "Push-ups\nSquats\nPlank\nLunges",

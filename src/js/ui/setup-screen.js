@@ -101,7 +101,7 @@ export class SetupScreen {
     el.orderLabel.textContent = t("order");
     el.orderAlphabetical.textContent = t("orderAlpha");
     el.orderRandom.textContent = t("orderRandom");
-    el.switchModeLabel.textContent = t("changeMode");
+    el.switchModeLabel.textContent = t(training ? "changeModeTraining" : "changeMode");
     el.switchModeAutomatic.textContent = t("modeAuto");
     el.switchModeManual.textContent = t("modeManual");
     el.start.textContent = t("start");

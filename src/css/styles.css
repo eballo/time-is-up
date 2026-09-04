@@ -168,14 +168,6 @@ header.title select {
 }
 .mode-icon { width: 19px; height: 19px; flex: 0 0 auto; }
 
-/* A note under a field, for the things a label cannot fit. */
-.field-hint {
-  display: block;
-  margin-top: 6px;
-  font-size: 12px;
-  color: var(--muted);
-}
-
 /* .fieldlabel is a <span> that only looks like a label: it names a group of
    buttons via aria-labelledby, and a real <label> may not label a group. */
 label, .fieldlabel { display: block; font-weight: 600; font-size: 13px; margin-bottom: 8px; }
@@ -474,6 +466,11 @@ input[type="number"] {
 }
 .summary li .delta.over { color: var(--danger); }
 .summary li .delta.under { color: var(--ok); }
+.summary li.aside {
+  color: var(--muted);
+  border-bottom: 0;
+}
+.summary li.aside .time { font-weight: 600; }
 .summary li.total {
   border-bottom: 0;
   font-weight: 800;

@@ -17,10 +17,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Training carries **its own accent** so the two modes are distinguishable
   across a room, and a **rest is kept off the green→amber→red ramp** entirely:
   it gets a cool colour of its own, because running out of rest is not something
-  to warn anyone about. During a rest the screen names the **next** exercise in
-  the large slot, which is what you need in order to get set.
-- The training summary lists the exercises only and separates time spent
-  **working** from the **total** including rests.
+  to warn anyone about. A rest says so in the headline, with the exercise you
+  are getting ready for on the line below it.
+- The training summary lists the exercises, then the time spent resting as its
+  own line, then the total — so where the time went is all on one screen.
+- Training labels the automatic/manual control **Activity switching**: a workout
+  is not changing person.
 
 ### Changed
 

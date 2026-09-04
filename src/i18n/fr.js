@@ -55,6 +55,7 @@ export default {
     modeLabel: "Mode",
     modeStandup: "Stand-up",
     modeTraining: "Entraînement",
+    changeModeTraining: "Changement d'activité",
     exercises: "Exercices",
     exercisesHint: "— un par ligne, dans l'ordre où vous les ferez.",
     exercisesPlaceholder: "Pompes\nSquats\nGainage\nFentes",

@@ -187,4 +187,11 @@ export class Session {
   get workedSpentSeconds() {
     return this.results.reduce((total, entry) => total + entry.spentSeconds, 0);
   }
+
+  /** Time spent recovering. Zero for a stand-up, and for a workout with no rest. */
+  get restSpentSeconds() {
+    return this.#results
+      .filter((entry) => entry.kind === SEGMENT.rest)
+      .reduce((total, entry) => total + entry.spentSeconds, 0);
+  }
 }

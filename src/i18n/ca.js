@@ -55,6 +55,7 @@ export default {
     modeLabel: "Mode",
     modeStandup: "Stand-up",
     modeTraining: "Entrenament",
+    changeModeTraining: "Canvi d'activitat",
     exercises: "Exercicis",
     exercisesHint: "— un per línia, en l'ordre que els faràs.",
     exercisesPlaceholder: "Flexions\nEsquats\nPlanxa\nZancades",

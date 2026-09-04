@@ -50,14 +50,17 @@ export class RunningScreen {
     const training = mode === MODE.training;
 
     if (session.isResting) {
-      el.eyebrow.textContent = this.#translator.translate("restingNow");
-      // What you are getting ready for is the useful thing to read here.
-      el.speaker.textContent = session.nextItemLabel ?? "";
+      el.eyebrow.textContent = this.#eyebrowFor(training, switchMode);
+      // The state you are in goes in the big slot; what you are getting ready
+      // for stays in view on the line below.
+      el.speaker.textContent = this.#translator.translate("restingNow");
       el.turnCount.textContent = this.#translator.format("exerciseXofY", {
         i: session.currentItemPosition + 1,
         n: session.totalItems
       });
-      el.nextUp.textContent = "";
+      el.nextUp.textContent = session.nextItemLabel
+        ? this.#translator.format("nextIs", { name: session.nextItemLabel })
+        : "";
     } else {
       el.eyebrow.textContent = this.#eyebrowFor(training, switchMode);
       el.speaker.textContent = session.currentLabel;

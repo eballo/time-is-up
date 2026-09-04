@@ -49,6 +49,10 @@ export class SummaryScreen {
     results.forEach((result, index) => {
       fragment.appendChild(this.#buildResultRow(result, index));
     });
+    // Rest is not an exercise, but it is part of where the time went, so it is
+    // shown once as its own line rather than folded silently into the total.
+    const restSeconds = session.restSpentSeconds;
+    if (restSeconds > 0) fragment.appendChild(this.#buildRestRow(restSeconds));
     fragment.appendChild(this.#buildTotalRow(total));
 
     replaceChildren(this.#elements.list, fragment);
@@ -65,6 +69,15 @@ export class SummaryScreen {
     else if (deltaSeconds < -1) delta.classList.add("under");
     row.appendChild(delta);
 
+    return row;
+  }
+
+  #buildRestRow(restSeconds) {
+    const row = createElement("li", "aside");
+    row.appendChild(createElement("span", "num", ""));
+    row.appendChild(createElement("span", "name", this.#translator.translate("restingNow")));
+    row.appendChild(createElement("span", "time", formatDuration(restSeconds)));
+    row.appendChild(createElement("span", "delta", ""));
     return row;
   }
 
