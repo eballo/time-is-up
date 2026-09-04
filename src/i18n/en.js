@@ -49,6 +49,28 @@ export default {
       "Time is up is a rotating timer for stand-ups (dailies): it gives everyone the same time to speak, so the meeting stays short and balanced.\n" +
       "Type the names, pick the minutes per person and the order (alphabetical or random), then press Start. A 5-second countdown runs before the first person.\n" +
       "In Automatic mode it moves to the next person on its own when time runs out; in Manual mode it just sounds the alert and you decide when to continue.\n" +
-      "At the end you see how long each person spoke and the total. Shortcuts: Space pauses, Right arrow next, R resets."
+      "At the end you see how long each person spoke and the total. Shortcuts: Space pauses, Right arrow next, R resets.",
+
+    /* training mode */
+    modeLabel: "Mode",
+    modeStandup: "Stand-up",
+    modeTraining: "Training",
+    exercises: "Exercises",
+    exercisesHint: "— one per line, in the order you'll do them.",
+    exercisesPlaceholder: "Push-ups\nSquats\nPlank\nLunges",
+    minutesPerExerciseLabel: "Minutes per exercise",
+    restLabel: "Rest between exercises",
+    restHint: "seconds · 0 to run them back to back",
+    addExercises: "Add exercises to get started.",
+    estimateTraining: "{items} · {min} each · {rest} rest · ~{total} total",
+    restNone: "no rest",
+    exerciseOne: "exercise",
+    exerciseOther: "exercises",
+    exerciseXofY: "Exercise {i} of {n}",
+    restingNow: "Rest",
+    skipRest: "Skip rest",
+    lastExercise: "Last exercise",
+    workoutDone: "💪 Workout finished",
+    doneSubTraining: "{items} · {worked} working · {total} in total"
   }
 };

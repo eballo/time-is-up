@@ -64,6 +64,22 @@ present).
 | `doneSub` | subtitle of the summary | `{people}`, `{total}`, `{target}` |
 | `total` | total row in the summary | |
 | `restart` | "start again" button | |
+| `modeLabel` | accessible name of the mode tabs | |
+| `modeStandup` / `modeTraining` | the two mode tabs | |
+| `exercises` / `exercisesHint` | label and hint of the exercise list | |
+| `exercisesPlaceholder` | example exercises | separate lines with `\n` |
+| `minutesPerExerciseLabel` | label of the duration field in training | |
+| `restLabel` / `restHint` | the rest field and the note under it | |
+| `addExercises` | shown when the exercise list is empty | |
+| `estimateTraining` | summary under the button, training mode | `{items}`, `{min}`, `{rest}`, `{total}` |
+| `restNone` | stands in for the rest value when it is 0 | |
+| `exerciseOne` / `exerciseOther` | plural of "exercise" | 1 vs. the rest |
+| `exerciseXofY` | "Exercise i of n" | `{i}`, `{n}` |
+| `restingNow` | eyebrow while resting | |
+| `skipRest` | the forward button during a rest | |
+| `lastExercise` | shown instead of "next" on the last exercise | |
+| `workoutDone` | title of the final screen, training mode | |
+| `doneSubTraining` | subtitle of the training summary | `{items}`, `{worked}`, `{total}` |
 | `getReady` | text above the 5s countdown | |
 | `prerollSkip` | hint for skipping the countdown | |
 | `themeToggle` | title/aria-label of the light/dark button | |

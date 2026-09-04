@@ -1,8 +1,11 @@
 # ⏱️ Time is up
 
-A rotating timer for **stand-ups / dailies**. It gives everyone the same time to
-speak and moves on to the next person when the time runs out, so the meeting
-stays short, balanced, and predictable.
+A rotating timer with two modes.
+
+- **Stand-up** — everyone gets the same time to speak, and it moves on when the
+  time runs out, so the meeting stays short, balanced and predictable.
+- **Training** — the same clock over a list of exercises, with a configurable
+  rest between them that you can cut short whenever you're ready.
 
 Static page: **no build, no dependencies, no backend**. Serve the folder with
 any static host — the code is ES modules, which browsers refuse to load from
@@ -13,6 +16,12 @@ any static host — the code is ES modules, which browsers refuse to load from
 ---
 
 ## Features
+
+### Modes
+
+Two tabs at the top of the setup screen. Each keeps its own list, duration and
+settings, so switching back and forth never costs you what you typed. Training
+carries its own accent so you can tell the two apart across a room.
 
 ### Setup
 
@@ -27,6 +36,11 @@ any static host — the code is ES modules, which browsers refuse to load from
 - **Estimate** — shown under the button: `N people · X min each · ~Y min total`
   (flagged as approximate in manual mode).
 
+In training mode the list becomes **Exercises**, the duration becomes minutes
+per exercise, and **Rest between exercises** replaces the order control — a
+workout's sequence is deliberate, so it runs as written. Rest is in seconds; 0
+runs the exercises back to back.
+
 ### During a round
 
 - **Start countdown** — 5 seconds ("Get ready" → 5·4·3·2·1) before the first
@@ -39,10 +53,16 @@ any static host — the code is ES modules, which browsers refuse to load from
 - **Participant queue** showing each person's state (now / done / upcoming).
 - **Controls**: Pause / Resume, Next ›, Reset.
 
+During a **rest**, the clock switches to its own cool colour — running out of
+rest is nothing to warn anyone about — the next exercise is shown large so you
+can get set, and the forward button becomes **Skip rest**.
+
 ### At the end
 
 - **Summary** with each person's actual speaking time, the **difference vs. the
   target** (`+M:SS` in red if over, `−M:SS` in green if under) and the **total**.
+  A workout lists the exercises only, and separates time spent working from the
+  total including rests.
 - **Fireworks** — a short celebratory `<canvas>` animation (~4s).
 
 ### Interface
@@ -97,8 +117,8 @@ src/
   js/
     app.js                 Wiring only: builds everything, routes events
     core/                  The rules. No DOM, no browser APIs.
-      turn-timer.js          TurnTimer     one speaker's countdown
-      standup-run.js         StandupRun    who speaks, in what order, for how long
+      turn-timer.js          TurnTimer  one segment's countdown
+      session.js             Session    the sequence of segments both modes run
     services/              Talking to the platform.
       preferences.js         Preferences   guarded localStorage
       translator.js          Translator    string lookup with fallback

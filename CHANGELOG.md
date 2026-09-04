@@ -7,6 +7,31 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+- **A training mode**, alongside the stand-up the app already did. It runs the
+  same clock over a list of exercises with a configurable rest between them,
+  which you can cut short with **Skip rest** whenever you're ready. Two tabs at
+  the top of the setup screen switch between the modes; each keeps its own list,
+  duration and settings, so moving between them never costs you what you typed.
+- Training carries **its own accent** so the two modes are distinguishable
+  across a room, and a **rest is kept off the green→amber→red ramp** entirely:
+  it gets a cool colour of its own, because running out of rest is not something
+  to warn anyone about. During a rest the screen names the **next** exercise in
+  the large slot, which is what you need in order to get set.
+- The training summary lists the exercises only and separates time spent
+  **working** from the **total** including rests.
+
+### Changed
+
+- `StandupRun` becomes `Session`: a sequence of timed segments. A stand-up is
+  one segment per person; a workout alternates exercise and rest and drops the
+  trailing rest, so the session ends on the last exercise rather than a rest
+  nobody asked for. Both modes now share the turn-taking, and neither carries a
+  copy of it.
+- The clock's class attribute is only rewritten when its state actually changes,
+  rather than four times a second on every tick.
+
 ## [1.1.0] - 2026-09-03
 
 ### Added

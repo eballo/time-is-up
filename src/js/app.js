@@ -7,7 +7,7 @@
  */
 import { languages, FALLBACK_LANGUAGE } from "../i18n/index.js";
 
-import { StandupRun, orderNames } from "./core/standup-run.js";
+import { Session, orderNames } from "./core/session.js";
 import { TurnTimer } from "./core/turn-timer.js";
 
 import { Chime } from "./services/chime.js";
@@ -21,7 +21,7 @@ import { Fireworks } from "./ui/fireworks.js";
 import { KeyboardShortcuts, SCREEN } from "./ui/keyboard-shortcuts.js";
 import { PrerollCountdown } from "./ui/preroll-countdown.js";
 import { RunningScreen } from "./ui/running-screen.js";
-import { SetupScreen } from "./ui/setup-screen.js";
+import { SetupScreen, MODE } from "./ui/setup-screen.js";
 import { SummaryScreen } from "./ui/summary-screen.js";
 import { TabTitle } from "./ui/tab-title.js";
 
@@ -47,7 +47,7 @@ export class App {
   #fireworks;
   #timer;
 
-  #run = null;
+  #session = null;
   #screen = SCREEN.setup;
 
   constructor() {
@@ -62,7 +62,8 @@ export class App {
       elements: this.#elements.setup,
       translator: this.#translator,
       preferences: this.#preferences,
-      onStart: () => this.#startRun()
+      onStart: () => this.#startRun(),
+      onModeChange: (mode) => this.#applyMode(mode)
     });
 
     this.#runningScreen = new RunningScreen({
@@ -95,6 +96,7 @@ export class App {
   start() {
     this.#buildLanguagePicker();
     this.#theme.apply();
+    this.#applyMode(this.#setupScreen.mode);
     this.#setLanguage(
       this.#translator.resolveInitialLanguage(this.#preferences.language, navigator.language)
     );
@@ -103,30 +105,46 @@ export class App {
 
   /* ---------- run lifecycle ---------- */
 
+  /** The mode swaps the accent and which fields show; the rules are identical. */
+  #applyMode(mode) {
+    document.documentElement.setAttribute("data-mode", mode);
+  }
+
   #startRun() {
-    const names = this.#setupScreen.names;
-    if (names.length === 0) return;
+    const entries = this.#setupScreen.entries;
+    if (entries.length === 0) return;
 
     this.#setupScreen.saveValues();
-    this.#run = new StandupRun({
-      names: orderNames(names, this.#setupScreen.order, (a, b) =>
-        this.#translator.compareNames(a, b)
-      ),
-      secondsPerPerson: minutesToSeconds(this.#setupScreen.minutesPerPerson)
-    });
+    this.#session = this.#buildSession(entries);
 
     this.#showScreen(SCREEN.countdown);
-    this.#runningScreen.primeFor(this.#run);
+    this.#runningScreen.primeFor(this.#session);
     this.#wakeLock.acquire(); // must ride the click that got us here
     this.#preroll.start();
   }
 
+  #buildSession(entries) {
+    const seconds = minutesToSeconds(this.#setupScreen.minutesPerItem);
+    if (this.#setupScreen.isTraining) {
+      // A workout's sequence is deliberate, so exercises run as written.
+      return Session.forTraining(entries, seconds, this.#setupScreen.restSeconds);
+    }
+    return Session.forStandup(
+      orderNames(entries, this.#setupScreen.order, (a, b) => this.#translator.compareNames(a, b)),
+      seconds
+    );
+  }
+
   #beginTurn() {
     this.#showScreen(SCREEN.running);
-    this.#timer.start(this.#run.secondsPerPerson);
-    this.#runningScreen.renderTurn(this.#run, this.#setupScreen.switchMode);
+    this.#timer.start(this.#session.currentSeconds);
+    this.#runningScreen.renderSegment(this.#session, this.#viewOptions);
     this.#runningScreen.renderPauseButton(false);
     this.#renderClock();
+  }
+
+  get #viewOptions() {
+    return { mode: this.#setupScreen.mode, switchMode: this.#setupScreen.switchMode };
   }
 
   #onSecondChanged(remainingSeconds) {
@@ -142,8 +160,8 @@ export class App {
   }
 
   #advance() {
-    this.#run.recordCurrentTurn(this.#timer.elapsedSeconds);
-    if (this.#run.advance()) {
+    this.#session.recordCurrent(this.#timer.elapsedSeconds);
+    if (this.#session.advance()) {
       this.#beginTurn();
     } else {
       this.#finishRun();
@@ -154,7 +172,7 @@ export class App {
     this.#timer.stop();
     this.#wakeLock.release();
     this.#tabTitle.reset();
-    this.#summaryScreen.render(this.#run);
+    this.#summaryScreen.render(this.#session, this.#setupScreen.mode);
     this.#chime.standupFinished();
     this.#showScreen(SCREEN.summary);
     this.#fireworks.launch();
@@ -183,19 +201,24 @@ export class App {
     this.#timer.stop();
     this.#wakeLock.release();
     this.#tabTitle.reset();
-    this.#run = null;
+    this.#session = null;
     this.#showScreen(SCREEN.setup);
     this.#setupScreen.refreshEstimate();
   }
 
   #renderClock() {
     const remaining = this.#timer.remainingSeconds;
-    this.#runningScreen.renderClock(
+    const resting = this.#session.isResting;
+    this.#runningScreen.renderClock(remaining, this.#timer.durationSeconds, {
+      switchMode: this.#setupScreen.switchMode,
+      isResting: resting
+    });
+    this.#tabTitle.showTurn(
       remaining,
-      this.#timer.durationSeconds,
-      this.#setupScreen.switchMode
+      resting
+        ? this.#translator.translate("restingNow")
+        : this.#session.currentLabel
     );
-    this.#tabTitle.showTurn(remaining, this.#run.currentName);
   }
 
   /* ---------- screens ---------- */
@@ -237,15 +260,15 @@ export class App {
     this.#theme.refreshLabel();
     this.#setupScreen.renderText();
     this.#runningScreen.renderText();
-    this.#runningScreen.renderPauseButton(this.#run !== null && !this.#timer.isRunning);
+    this.#runningScreen.renderPauseButton(this.#session !== null && !this.#timer.isRunning);
     this.#preroll.renderText();
     this.#summaryScreen.renderText();
 
     if (this.#screen === SCREEN.running) {
-      this.#runningScreen.renderTurn(this.#run, this.#setupScreen.switchMode);
+      this.#runningScreen.renderSegment(this.#session, this.#viewOptions);
       this.#renderClock();
-    } else if (this.#screen === SCREEN.summary && this.#run) {
-      this.#summaryScreen.render(this.#run);
+    } else if (this.#screen === SCREEN.summary && this.#session) {
+      this.#summaryScreen.render(this.#session, this.#setupScreen.mode);
     }
   }
 

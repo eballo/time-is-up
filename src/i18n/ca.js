@@ -49,6 +49,28 @@ export default {
       "Time is up és un cronòmetre rotatiu per als stand-ups (dailies): dona a cada persona el mateix temps per parlar, així la reunió és curta i equilibrada.\n" +
       "Escriu els noms, tria els minuts per persona i l'ordre (alfabètic o aleatori) i prem Comença. Hi ha un compte enrere de 5 segons abans de la primera persona.\n" +
       "En mode Automàtic es passa sol a la següent persona quan s'acaba el temps; en mode Manual sona l'avís i tu decideixes quan continuar.\n" +
-      "Al final veuràs quant ha parlat cadascú i el total. Dreceres: Espai pausa, Fletxa dreta següent, R reinicia."
+      "Al final veuràs quant ha parlat cadascú i el total. Dreceres: Espai pausa, Fletxa dreta següent, R reinicia.",
+
+    /* training mode */
+    modeLabel: "Mode",
+    modeStandup: "Stand-up",
+    modeTraining: "Entrenament",
+    exercises: "Exercicis",
+    exercisesHint: "— un per línia, en l'ordre que els faràs.",
+    exercisesPlaceholder: "Flexions\nEsquats\nPlanxa\nZancades",
+    minutesPerExerciseLabel: "Minuts per exercici",
+    restLabel: "Descans entre exercicis",
+    restHint: "segons · 0 per encadenar-los",
+    addExercises: "Afegeix exercicis per començar.",
+    estimateTraining: "{items} · {min} cadascun · {rest} de descans · ~{total} en total",
+    restNone: "sense descans",
+    exerciseOne: "exercici",
+    exerciseOther: "exercicis",
+    exerciseXofY: "Exercici {i} de {n}",
+    restingNow: "Descans",
+    skipRest: "Salta el descans",
+    lastExercise: "Últim exercici",
+    workoutDone: "💪 Entrenament acabat",
+    doneSubTraining: "{items} · {worked} d'exercici · {total} en total"
   }
 };

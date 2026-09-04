@@ -49,6 +49,28 @@ export default {
       "Time is up is een roterende timer voor stand-ups (dailies): iedereen krijgt evenveel spreektijd, zodat de meeting kort en in balans blijft.\n" +
       "Typ de namen, kies de minuten per persoon en de volgorde (alfabetisch of willekeurig) en druk op Starten. Er loopt een aftelling van 5 seconden vóór de eerste persoon.\n" +
       "In de modus Automatisch gaat het vanzelf naar de volgende persoon als de tijd om is; in Handmatig klinkt alleen het signaal en bepaal jij wanneer je doorgaat.\n" +
-      "Aan het eind zie je hoe lang iedereen sprak en het totaal. Sneltoetsen: Spatie pauzeert, Pijl rechts volgende, R reset."
+      "Aan het eind zie je hoe lang iedereen sprak en het totaal. Sneltoetsen: Spatie pauzeert, Pijl rechts volgende, R reset.",
+
+    /* training mode */
+    modeLabel: "Modus",
+    modeStandup: "Stand-up",
+    modeTraining: "Training",
+    exercises: "Oefeningen",
+    exercisesHint: "— één per regel, in de volgorde die je aanhoudt.",
+    exercisesPlaceholder: "Push-ups\nSquats\nPlank\nLunges",
+    minutesPerExerciseLabel: "Minuten per oefening",
+    restLabel: "Rust tussen oefeningen",
+    restHint: "seconden · 0 om door te gaan",
+    addExercises: "Voeg oefeningen toe om te beginnen.",
+    estimateTraining: "{items} · {min} elk · {rest} rust · ~{total} in totaal",
+    restNone: "geen rust",
+    exerciseOne: "oefening",
+    exerciseOther: "oefeningen",
+    exerciseXofY: "Oefening {i} van {n}",
+    restingNow: "Rust",
+    skipRest: "Rust overslaan",
+    lastExercise: "Laatste oefening",
+    workoutDone: "💪 Training klaar",
+    doneSubTraining: "{items} · {worked} actief · {total} in totaal"
   }
 };

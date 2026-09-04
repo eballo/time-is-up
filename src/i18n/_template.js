@@ -74,6 +74,30 @@ export default {
       "Time is up is a rotating timer for stand-ups: everyone gets the same time to speak.\n" +
       "Type the names, pick minutes per person and the order, then press Start.\n" +
       "Automatic mode moves on by itself; Manual mode waits for you to press Next.\n" +
-      "At the end you see each person's time and the total."
+      "At the end you see each person's time and the total.",
+
+    /* ---- training mode ---- */
+    modeLabel: "Mode",
+    modeStandup: "Stand-up",
+    modeTraining: "Training",
+    exercises: "Exercises",
+    exercisesHint: "\u2014 one per line, in the order you'll do them.",
+    exercisesPlaceholder: "Push-ups\nSquats\nPlank\nLunges",
+    minutesPerExerciseLabel: "Minutes per exercise",
+    restLabel: "Rest between exercises",
+    restHint: "seconds \u00b7 0 to run them back to back",
+    addExercises: "Add exercises to get started.",
+    // {items} = "4 exercises", {min} = "0.5 min", {rest} = "30 s", {total} = "4 min"
+    estimateTraining: "{items} \u00b7 {min} each \u00b7 {rest} rest \u00b7 ~{total} total",
+    restNone: "no rest",
+    exerciseOne: "exercise",
+    exerciseOther: "exercises",
+    exerciseXofY: "Exercise {i} of {n}",
+    restingNow: "Rest",
+    skipRest: "Skip rest",
+    lastExercise: "Last exercise",
+    workoutDone: "\ud83d\udcaa Workout finished",
+    // {worked} = time actually exercising, {total} = including rests
+    doneSubTraining: "{items} \u00b7 {worked} working \u00b7 {total} in total"
   }
 };
