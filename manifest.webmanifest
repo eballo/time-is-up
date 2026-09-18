@@ -1,0 +1,19 @@
+{
+  "name": "Time is up",
+  "short_name": "Time is up",
+  "description": "A rotating timer for stand-ups and workouts. Everyone gets the same time to speak, or run a list of exercises with rest in between.",
+  "id": "./",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "any",
+  "lang": "en",
+  "categories": ["productivity", "health", "utilities"],
+  "background_color": "#f4f5f7",
+  "theme_color": "#f4f5f7",
+  "icons": [
+    { "src": "icons/icon-192.png", "sizes": "192x192", "type": "image/png" },
+    { "src": "icons/icon-512.png", "sizes": "512x512", "type": "image/png" },
+    { "src": "icons/icon-maskable-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
+  ]
+}

@@ -96,6 +96,10 @@ can get set, and the forward button becomes **Skip rest**.
 - **Link previews**: sharing the URL renders a card built from the app's own
   clock ([`og-image.png`](og-image.png)), with Open Graph, Twitter and
   `WebApplication` structured data behind it.
+- **Installable** — a progressive web app. *Install* from the browser's menu
+  (or *Add to Home Screen* on iOS) puts it on the home screen or dock as its
+  own window, and once it has loaded once it **works offline**: the meeting
+  room's Wi-Fi is no longer part of the stand-up.
 
 ### Persistence
 
@@ -122,6 +126,9 @@ English.
 ```
 index.html                 Markup; loads src/js/app.js as a module
 favicon.svg
+manifest.webmanifest       What makes the page installable: name, icons, colours
+sw.js                      Service worker: network first, cache when there is none
+icons/                     App icons (PNG, from icon.svg via scripts/icons.sh)
 src/
   css/styles.css           All styles (themes, animations, responsive)
   js/
@@ -135,6 +142,7 @@ src/
       chime.js               Chime         WebAudio cues
       theme-controller.js    ThemeController
       screen-wake-lock.js    ScreenWakeLock
+      offline-copy.js        registers the service worker
     ui/                    Everything that paints.
       elements.js            collectElements()  every id, resolved once
       setup-screen.js        SetupScreen
@@ -171,6 +179,11 @@ python3 -m http.server 8000
 Opening `index.html` straight from disk does not work: browsers block ES module
 loading over `file://`.
 
+The service worker registers on `localhost` too, so a change you have just
+made is still what you see — it fetches from the network first and only falls
+back to its cache when that fails. To start from nothing, *Application →
+Service workers → Unregister* in the devtools.
+
 ---
 
 ## Tests
@@ -203,6 +216,10 @@ They cover the parts that are worth covering — the ones that fail *silently*:
   language degrades to English rather than to blanks.
 - **`src/i18n/`** — that every language carries the same keys with the same
   placeholders, and that the template still produces a complete language.
+- **`sw.js` and `manifest.webmanifest`** — that every module under `src/` is in
+  the precache list, since one left out only fails offline; that every path
+  the list and the manifest name exists; and that the manifest's colours match
+  the page's.
 
 Deliberately **not** covered: anything that needs a browser. The layout, the
 CSS states and the timing bugs found during development were all visual, and a
@@ -259,8 +276,14 @@ after". Do not edit it by hand — that is what drifts.
 
 Pages is not deployed by any workflow: the site is served from the `main`
 branch, so merging publishes it. The release archive carries `index.html`,
-`favicon.svg`, `og-image.png`, `LICENSE` and `src/`; docs, tests, scripts and
-CI config are stripped by `.gitattributes`.
+`favicon.svg`, `og-image.png`, `manifest.webmanifest`, `sw.js`, `icons/`,
+`LICENSE` and `src/`; docs, tests, scripts and CI config are stripped by
+`.gitattributes`.
+
+The service worker's cache is named after `APP_VERSION`, so a release also
+retires the cache of the one before it on every installed copy. Between
+releases an installed copy still sees each deploy on its next load: the worker
+asks the network first and only serves its cache when that fails.
 
 ---
 
