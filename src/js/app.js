@@ -11,6 +11,7 @@ import { Session, orderNames } from "./core/session.js";
 import { TurnTimer } from "./core/turn-timer.js";
 
 import { Chime } from "./services/chime.js";
+import { registerOfflineCopy } from "./services/offline-copy.js";
 import { Preferences } from "./services/preferences.js";
 import { ScreenWakeLock } from "./services/screen-wake-lock.js";
 import { ThemeController } from "./services/theme-controller.js";
@@ -110,6 +111,9 @@ export class App {
       this.#translator.resolveInitialLanguage(this.#preferences.language, navigator.language)
     );
     this.#showScreen(SCREEN.setup);
+    // Last: the page is up either way, and the worker only matters from the
+    // second visit on.
+    registerOfflineCopy();
   }
 
   /* ---------- run lifecycle ---------- */

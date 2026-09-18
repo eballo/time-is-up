@@ -7,6 +7,19 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+- **Installable as an app.** A web manifest, a set of PNG icons (the launcher
+  will not take the SVG the tab uses) and a service worker make the page a
+  progressive web app: *Install* from the browser's menu, or *Add to Home
+  Screen* on iOS, puts it on the home screen or dock as its own window. Once it
+  has loaded once it works offline. The worker asks the network first and only
+  serves its cache when the network fails or stalls, so a deploy is still seen
+  on the next load and there is never a stale copy to explain; the cache is
+  named after `APP_VERSION`, so a release retires the previous one. A test
+  keeps the precache list in step with the modules under `src/`, since a file
+  left out of it only fails offline.
+
 ## [1.2.0] - 2026-09-04
 
 ### Added
