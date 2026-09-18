@@ -9,4 +9,4 @@
  * the CHANGELOG heading and the git tag together, which is the only way the
  * three stay in step.
  */
-export const APP_VERSION = "1.2.0";
+export const APP_VERSION = "1.3.0";
