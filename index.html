@@ -95,11 +95,18 @@
       </button>
     </div>
 
-    <label for="names">
+    <div class="field workout-field" id="field-workout" hidden>
+      <label for="workout" id="lbl-workout"></label>
+      <!-- options are filled in from src/i18n/workouts -->
+      <select id="workout"></select>
+    </div>
+
+    <label for="names" id="lbl-entries">
       <span id="lbl-people"></span>
       <span class="hint" id="lbl-people-hint"></span>
     </label>
     <textarea id="names"></textarea>
+    <div class="workout-preview" id="workout-preview" hidden></div>
 
     <div class="row">
       <div class="field grow">
@@ -112,6 +119,13 @@
           <span class="hint" id="rest-hint"></span>
         </label>
         <input type="number" id="rest" min="0" max="300" step="5" value="30">
+      </div>
+      <div class="field" id="field-block-rest" hidden>
+        <label for="block-rest">
+          <span id="lbl-block-rest"></span>
+          <span class="hint" id="block-rest-hint"></span>
+        </label>
+        <input type="number" id="block-rest" min="0" max="300" step="5" value="60">
       </div>
       <div class="field" id="field-order">
         <span class="fieldlabel" id="lbl-order"></span>
@@ -146,7 +160,12 @@
     <div class="stage">
       <div class="eyebrow" id="eyebrow"></div>
       <div class="speaker" id="speaker" aria-live="polite" aria-atomic="true">—</div>
-      <div class="clock" id="clock" role="timer" aria-live="off">1:30</div>
+      <div class="exercise-desc" id="exercise-desc" hidden></div>
+      <!-- the figure, when the exercise has one, stands beside the clock -->
+      <div class="stage-main">
+        <div class="exercise-figure" id="exercise-figure" hidden></div>
+        <div class="clock" id="clock" role="timer" aria-live="off">1:30</div>
+      </div>
       <div class="overtime-note" id="overtime-note" hidden></div>
 
       <div class="progress" id="turnbar"><i></i></div>

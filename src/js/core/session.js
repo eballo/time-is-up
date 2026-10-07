@@ -37,12 +37,58 @@ export function shuffle(entries) {
 }
 
 /**
+ * Blocks of entries, a blank line closing one block and opening the next.
+ * A list with no blank lines is a single block.
+ */
+export function parseBlocks(text) {
+  return text
+    .split(/\n\s*\n/)
+    .map(parseLines)
+    .filter((block) => block.length > 0);
+}
+
+/**
+ * A programme day as Session.forTraining takes it: each block's exercises
+ * gone through `rounds` times — A, B, A, B, … — before moving on.
+ *
+ * @param {{blocks: {title: string, exercises: [string, string][]}[]}} day
+ * @param {string[][]} [figures]  a figure id per exercise, as [block][exercise]
+ */
+export function workoutDayBlocks(day, rounds, figures = null) {
+  return day.blocks.map(({ title, exercises }, b) => ({
+    title,
+    items: Array.from({ length: rounds }, () =>
+      exercises.map(([label, description], e) => ({
+        label,
+        description,
+        figure: figures?.[b]?.[e] ?? null
+      }))
+    ).flat()
+  }));
+}
+
+/**
  * @param {string[]} names
  * @param {"alphabetical"|"random"} order
  * @param {(a: string, b: string) => number} compare  locale-aware comparator
  */
 export function orderNames(names, order, compare) {
   return order === "alphabetical" ? names.slice().sort(compare) : shuffle(names);
+}
+
+/** Every shape forTraining accepts, as [{title, items}]. */
+function toBlocks(exercises) {
+  if (!exercises.length) return [];
+  const first = exercises[0];
+  if (Array.isArray(first)) return exercises.map((items) => ({ title: null, items }));
+  if (first.items) return exercises.map(({ title = null, items }) => ({ title, items }));
+  return [{ title: null, items: exercises }];
+}
+
+function toItem(item) {
+  return typeof item === "string"
+    ? { label: item, description: null, figure: null }
+    : { label: item.label, description: item.description ?? null, figure: item.figure ?? null };
 }
 
 export const ITEM_STATUS = {
@@ -56,7 +102,7 @@ export class Session {
   #index = 0;
   #results = [];
 
-  /** @param {{label: string, seconds: number, kind: string}[]} segments */
+  /** @param {{label: string, seconds: number, kind: string, block?: number, blockTitle?: string, description?: string}[]} segments */
   constructor(segments) {
     if (!segments.length) throw new Error("A session needs at least one segment");
     this.#segments = segments;
@@ -72,13 +118,27 @@ export class Session {
   /**
    * Exercise, rest, exercise, … with the trailing rest dropped: the workout is
    * over when the last exercise is, not a rest later.
+   *
+   * Takes a flat list, a list of blocks, or a list of {title, items} blocks;
+   * an item is a label or a {label, description}.
+   *
+   * The rest between two blocks is `blockRestSeconds` — longer, as a rule —
+   * and stands in for the ordinary rest there rather than adding to it.
    */
-  static forTraining(exercises, workSeconds, restSeconds) {
+  static forTraining(exercises, workSeconds, restSeconds, blockRestSeconds = restSeconds) {
+    const flat = toBlocks(exercises).flatMap(({ title, items }, block) =>
+      items.map((item) => ({ ...toItem(item), block, blockTitle: title }))
+    );
     const segments = [];
-    exercises.forEach((label, index) => {
-      segments.push({ label, seconds: workSeconds, kind: SEGMENT.exercise });
-      if (restSeconds > 0 && index < exercises.length - 1) {
-        segments.push({ label: null, seconds: restSeconds, kind: SEGMENT.rest });
+    flat.forEach((exercise, index) => {
+      segments.push({ ...exercise, seconds: workSeconds, kind: SEGMENT.exercise });
+      if (index === flat.length - 1) return;
+      // A rest belongs to the block it leads into, so the one before a new
+      // block is where that block gets announced.
+      const { block, blockTitle } = flat[index + 1];
+      const seconds = block !== exercise.block ? blockRestSeconds : restSeconds;
+      if (seconds > 0) {
+        segments.push({ label: null, seconds, kind: SEGMENT.rest, block, blockTitle });
       }
     });
     return new Session(segments);
@@ -92,12 +152,60 @@ export class Session {
     return this.current.label;
   }
 
+  /**
+   * How the exercise is done. During a rest, the one coming up — that is the
+   * one worth reading about while you get into position.
+   */
+  get currentDescription() {
+    return this.#upcomingExercise?.description ?? null;
+  }
+
+  /** The figure that shows the exercise, picked the same way as the description. */
+  get currentFigure() {
+    return this.#upcomingExercise?.figure ?? null;
+  }
+
+  /** The current segment, or during a rest the next one that is not. */
+  get #upcomingExercise() {
+    for (let i = this.#index; i < this.#segments.length; i += 1) {
+      if (this.#segments[i].kind !== SEGMENT.rest) return this.#segments[i];
+    }
+    return null;
+  }
+
+  /** The block's name, when the workout gives its blocks one. */
+  get currentBlockTitle() {
+    return this.current.blockTitle ?? null;
+  }
+
   get currentSeconds() {
     return this.current.seconds;
   }
 
   get isResting() {
     return this.current.kind === SEGMENT.rest;
+  }
+
+  /* ---- blocks: only a workout split by blank lines has more than one ---- */
+
+  get totalBlocks() {
+    return new Set(this.#segments.map((segment) => segment.block ?? 0)).size;
+  }
+
+  /** 1-based block of the current segment; a rest counts as the block ahead. */
+  get currentBlockPosition() {
+    return (this.current.block ?? 0) + 1;
+  }
+
+  /** What the whole session adds up to if every segment runs to time. */
+  get plannedSeconds() {
+    return this.#segments.reduce((total, segment) => total + segment.seconds, 0);
+  }
+
+  /** True for the rest that leads from one block into the next. */
+  get isBlockChange() {
+    const previous = this.#segments[this.#index - 1];
+    return this.isResting && previous !== undefined && previous.block !== this.current.block;
   }
 
   get isLast() {

@@ -60,11 +60,17 @@ export default {
     modeTraining: "Training",
     changeModeTraining: "Wisselen van oefening",
     exercises: "Oefeningen",
-    exercisesHint: "— één per regel, in de volgorde die je aanhoudt.",
+    exercisesHint: "— één per regel, in de volgorde die je aanhoudt. Een lege regel begint een nieuw blok.",
     exercisesPlaceholder: "Push-ups\nSquats\nPlank\nLunges",
-    minutesPerExerciseLabel: "Minuten per oefening",
+    exercisesDefault:
+      "Military press\nSquats met dumbbells\nMilitary press\nSquats met dumbbells\nMilitary press\nSquats met dumbbells\n\n" +
+      "Dumbbell rows\nLunges met dumbbells\nDumbbell rows\nLunges met dumbbells\nDumbbell rows\nLunges met dumbbells\n\n" +
+      "Push-ups\nRussian twists\nPush-ups\nRussian twists\nPush-ups\nRussian twists",
+    secondsPerExerciseLabel: "Seconden per oefening",
     restLabel: "Rust tussen oefeningen",
     restHint: "seconden · 0 om door te gaan",
+    blockRestLabel: "Rust tussen blokken",
+    blockRestHint: "seconden · de blokwissel",
     addExercises: "Voeg oefeningen toe om te beginnen.",
     estimateTraining: "{items} · {min} elk · {rest} rust · ~{total} in totaal",
     restNone: "geen rust",
@@ -74,6 +80,15 @@ export default {
     restingNow: "Rust",
     skipRest: "Rust overslaan",
     lastExercise: "Laatste oefening",
+    blockStarting: "We beginnen aan blok {i}",
+    blockXofY: "Blok {i} van {n}",
+    blockChange: "Blokwissel!",
+    letsGo: "Daar gaan we!",
+    workoutLabel: "Schema",
+    workoutCustom: "Eigen lijst",
+    workoutDay: "Dag {n} · {title}",
+    workoutHint: "— elk blok doe je {rounds} keer achter elkaar (A, B, A, B…).",
+    blockTitle: "Blok {i}: {title}",
     workoutDone: "💪 Training klaar",
     doneSubTraining: "{items} · {worked} actief · {total} in totaal"
   }

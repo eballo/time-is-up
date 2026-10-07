@@ -1,6 +1,15 @@
-import { createElement } from "../util/dom.js";
-import { parseLines } from "../core/session.js";
-import { clampMinutesPerPerson, clampRestSeconds } from "../services/preferences.js";
+import { createElement, replaceChildren } from "../util/dom.js";
+import { Session, parseBlocks, parseLines, workoutDayBlocks } from "../core/session.js";
+import { workoutsFor, ROUNDS_PER_BLOCK } from "../../i18n/workouts/index.js";
+import { createFigure, figuresForDay } from "./exercise-figures.js";
+import {
+  clampMinutesPerPerson,
+  clampRestSeconds,
+  clampBlockRestSeconds,
+  clampSecondsPerExercise,
+  MIN_SECONDS_PER_EXERCISE,
+  MAX_SECONDS_PER_EXERCISE
+} from "../services/preferences.js";
 import { formatRoughMinutes, minutesToSeconds } from "../util/time-format.js";
 
 export const MODE = { standup: "standup", training: "training" };
@@ -11,6 +20,9 @@ export const MODE = { standup: "standup", training: "training" };
  * The two modes share one list box and one duration field — only their labels
  * and the fields beside them differ — so switching modes swaps the saved text
  * in and out rather than duplicating the markup.
+ *
+ * Training can also run a day of the built-in programme instead of the list:
+ * the box then gives way to a read-only preview of that day.
  */
 export class SetupScreen {
   #elements;
@@ -22,6 +34,11 @@ export class SetupScreen {
   #mode;
   #order;
   #switchMode;
+  /* True while the exercise box still holds the built-in workout. It follows
+     the language and is never saved, until the first edit makes it yours. */
+  #showingDefaultExercises = false;
+  /** 1-based programme day, or null for your own list. */
+  #workoutDay;
 
   constructor({ elements, translator, preferences, onStart, onModeChange }) {
     this.#elements = elements;
@@ -33,6 +50,7 @@ export class SetupScreen {
     this.#mode = preferences.mode;
     this.#order = preferences.order;
     this.#switchMode = preferences.switchMode;
+    this.#workoutDay = preferences.workoutDay;
 
     this.#bindEvents();
     this.#restoreSavedValues();
@@ -56,15 +74,55 @@ export class SetupScreen {
 
   /** The people, or the exercises — whichever mode is showing. */
   get entries() {
+    const blocks = this.workoutBlocks;
+    if (blocks) return blocks.flatMap((block) => block.items.map((item) => item.label));
     return parseLines(this.#elements.entries.value);
   }
 
-  get minutesPerItem() {
+  /** The chosen programme day, ready for Session.forTraining; null otherwise. */
+  get workoutBlocks() {
+    const day = this.#selectedDay;
+    return day
+      ? workoutDayBlocks(day, ROUNDS_PER_BLOCK, figuresForDay(this.#workoutDay - 1))
+      : null;
+  }
+
+  get #days() {
+    return workoutsFor(this.#translator.language);
+  }
+
+  get #selectedDay() {
+    if (!this.isTraining || this.#workoutDay === null) return null;
+    return this.#days[this.#workoutDay - 1] ?? null;
+  }
+
+  /** The workout as blocks: the chosen day's, or the box split on blank lines. */
+  get trainingBlocks() {
+    return this.workoutBlocks ?? parseBlocks(this.#elements.entries.value);
+  }
+
+  /** The duration field holds minutes for a stand-up and seconds for a workout. */
+  get secondsPerItem() {
+    return this.isTraining
+      ? clampSecondsPerExercise(this.#elements.minutes.value)
+      : minutesToSeconds(this.#minutesPerPerson);
+  }
+
+  get #minutesPerPerson() {
     return clampMinutesPerPerson(this.#elements.minutes.value);
+  }
+
+  /** The field's value, cleaned up, in whichever unit the mode uses. */
+  get #durationFieldValue() {
+    return this.isTraining ? this.secondsPerItem : this.#minutesPerPerson;
   }
 
   get restSeconds() {
     return this.isTraining ? clampRestSeconds(this.#elements.rest.value) : 0;
+  }
+
+  get blockRestSeconds() {
+    return this.isTraining ? clampBlockRestSeconds(this.#elements.blockRest.value) : 0;
   }
 
   get canStart() {
@@ -75,10 +133,11 @@ export class SetupScreen {
   saveValues() {
     this.#saveEntriesFor(this.#mode);
     if (this.isTraining) {
-      this.#preferences.minutesPerExercise = this.minutesPerItem;
+      this.#preferences.secondsPerExercise = this.secondsPerItem;
       this.#preferences.restSeconds = this.restSeconds;
+      this.#preferences.blockRestSeconds = this.blockRestSeconds;
     } else {
-      this.#preferences.minutesPerPerson = this.minutesPerItem;
+      this.#preferences.minutesPerPerson = this.#minutesPerPerson;
     }
   }
 
@@ -91,12 +150,20 @@ export class SetupScreen {
     el.modeTrainingLabel.textContent = t("modeTraining");
     el.modeGroup.setAttribute("aria-label", t("modeLabel"));
 
+    if (training && this.#showingDefaultExercises) el.entries.value = t("exercisesDefault");
     el.entries.placeholder = t(training ? "exercisesPlaceholder" : "namesPlaceholder");
     el.entriesLabel.textContent = t(training ? "exercises" : "people");
-    el.entriesHint.textContent = t(training ? "exercisesHint" : "peopleHint");
-    el.minutesLabel.textContent = t(training ? "minutesPerExerciseLabel" : "minutesLabel");
+    el.entriesHint.textContent = this.#selectedDay
+      ? this.#translator.format("workoutHint", { rounds: ROUNDS_PER_BLOCK })
+      : t(training ? "exercisesHint" : "peopleHint");
+    el.workoutLabel.textContent = t("workoutLabel");
+    this.#renderWorkoutPicker();
+    this.#renderWorkoutPreview();
+    el.minutesLabel.textContent = t(training ? "secondsPerExerciseLabel" : "minutesLabel");
     el.restLabel.textContent = t("restLabel");
     el.restHint.textContent = t("restHint");
+    el.blockRestLabel.textContent = t("blockRestLabel");
+    el.blockRestHint.textContent = t("blockRestHint");
 
     el.orderLabel.textContent = t("order");
     el.orderAlphabetical.textContent = t("orderAlpha");
@@ -128,7 +195,7 @@ export class SetupScreen {
   }
 
   #standupEstimate(people) {
-    const minutes = this.minutesPerItem;
+    const minutes = this.#minutesPerPerson;
     let text = this.#translator.format("estimate", {
       people: this.#translator.countPeople(people),
       min: this.#translator.minuteValue(minutes),
@@ -142,13 +209,19 @@ export class SetupScreen {
   }
 
   #trainingEstimate(exercises) {
-    const minutes = this.minutesPerItem;
+    const seconds = this.secondsPerItem;
     const rest = this.restSeconds;
-    // Rests sit between exercises, so there is one fewer of them.
-    const totalSeconds = exercises * minutesToSeconds(minutes) + Math.max(0, exercises - 1) * rest;
+    // Built rather than multiplied out: which rests are the longer block
+    // changes depends on where the blocks fall.
+    const totalSeconds = Session.forTraining(
+      this.trainingBlocks,
+      seconds,
+      rest,
+      this.blockRestSeconds
+    ).plannedSeconds;
     let text = this.#translator.format("estimateTraining", {
       items: this.#translator.countExercises(exercises),
-      min: this.#translator.minuteValue(minutes),
+      min: `${seconds} s`,
       rest: rest > 0 ? `${rest} s` : this.#translator.translate("restNone"),
       total: formatRoughMinutes(totalSeconds)
     });
@@ -156,6 +229,69 @@ export class SetupScreen {
       text += this.#translator.translate("estimateManualSuffix");
     }
     return text;
+  }
+
+  #renderWorkoutPicker() {
+    const fragment = document.createDocumentFragment();
+    const custom = createElement("option", null, this.#translator.translate("workoutCustom"));
+    custom.value = "";
+    fragment.appendChild(custom);
+    this.#days.forEach((day, index) => {
+      const option = createElement(
+        "option",
+        null,
+        this.#translator.format("workoutDay", { n: index + 1, title: day.title })
+      );
+      option.value = String(index + 1);
+      fragment.appendChild(option);
+    });
+    replaceChildren(this.#elements.workout, fragment);
+    this.#elements.workout.value = this.#selectedDayValue;
+  }
+
+  get #selectedDayValue() {
+    return this.#workoutDay !== null && this.#days[this.#workoutDay - 1]
+      ? String(this.#workoutDay)
+      : "";
+  }
+
+  /** Each block once, with what every exercise involves. */
+  #renderWorkoutPreview() {
+    const day = this.#selectedDay;
+    const figures = day ? figuresForDay(this.#workoutDay - 1) : null;
+    const fragment = document.createDocumentFragment();
+    day?.blocks.forEach(({ title, exercises }, index) => {
+      const block = createElement("section", "workout-block");
+      // Same colours as the running screen, so a block looks the same in both.
+      block.dataset.block = String((index % 4) + 1);
+      block.appendChild(
+        createElement("h3", null, this.#translator.format("blockTitle", { i: index + 1, title }))
+      );
+      const list = createElement("ol");
+      exercises.forEach(([name, description], e) => {
+        const row = createElement("li");
+        const figure = createFigure(figures?.[index]?.[e]);
+        if (figure) {
+          row.classList.add("has-figure");
+          row.appendChild(figure);
+        }
+        const text = createElement("span", "text");
+        text.appendChild(createElement("span", "name", name));
+        text.appendChild(createElement("span", "desc", description));
+        row.appendChild(text);
+        list.appendChild(row);
+      });
+      block.appendChild(list);
+      fragment.appendChild(block);
+    });
+    replaceChildren(this.#elements.workoutPreview, fragment);
+  }
+
+  #setWorkoutDay(value) {
+    this.#workoutDay = value === "" ? null : Number(value);
+    this.#preferences.workoutDay = this.#workoutDay;
+    this.#reflectMode();
+    this.renderText();
   }
 
   #renderHelpBody() {
@@ -173,10 +309,19 @@ export class SetupScreen {
     el.modeStandup.addEventListener("click", () => this.#setMode(MODE.standup));
     el.modeTraining.addEventListener("click", () => this.#setMode(MODE.training));
 
-    el.entries.addEventListener("input", () => this.refreshEstimate());
+    el.workout.addEventListener("change", () => this.#setWorkoutDay(el.workout.value));
+    el.entries.addEventListener("input", () => {
+      if (this.isTraining) this.#showingDefaultExercises = false;
+      this.refreshEstimate();
+    });
     el.minutes.addEventListener("input", () => this.refreshEstimate());
     el.minutes.addEventListener("change", () => {
-      el.minutes.value = this.minutesPerItem;
+      el.minutes.value = this.#durationFieldValue;
+      this.refreshEstimate();
+    });
+    el.blockRest.addEventListener("input", () => this.refreshEstimate());
+    el.blockRest.addEventListener("change", () => {
+      el.blockRest.value = this.blockRestSeconds;
       this.refreshEstimate();
     });
     el.rest.addEventListener("input", () => this.refreshEstimate());
@@ -195,8 +340,9 @@ export class SetupScreen {
   #restoreSavedValues() {
     const el = this.#elements;
     el.entries.value = this.#savedEntriesFor(this.#mode);
-    el.minutes.value = this.#savedMinutesFor(this.#mode);
+    el.minutes.value = this.#savedDurationFor(this.#mode);
     el.rest.value = this.#preferences.restSeconds ?? clampRestSeconds(null);
+    el.blockRest.value = this.#preferences.blockRestSeconds ?? clampBlockRestSeconds(null);
     this.#reflectMode();
     this.#reflectOrder();
     this.#reflectSwitchMode();
@@ -206,40 +352,44 @@ export class SetupScreen {
     if (mode === this.#mode) return;
     // Hold on to what was typed for the mode being left.
     this.#saveEntriesFor(this.#mode);
-    this.#saveMinutesFor(this.#mode);
+    this.#saveDurationFor(this.#mode);
 
     this.#mode = mode;
     this.#preferences.mode = mode;
 
     this.#elements.entries.value = this.#savedEntriesFor(mode);
-    this.#elements.minutes.value = this.#savedMinutesFor(mode);
     this.#reflectMode();
+    this.#elements.minutes.value = this.#savedDurationFor(mode);
     this.renderText();
     this.#onModeChange(mode);
   }
 
   #savedEntriesFor(mode) {
-    return mode === MODE.training ? this.#preferences.exercises : this.#preferences.names;
+    if (mode !== MODE.training) return this.#preferences.names;
+    const saved = this.#preferences.exercises;
+    this.#showingDefaultExercises = saved === null;
+    return saved ?? this.#translator.translate("exercisesDefault");
   }
 
   #saveEntriesFor(mode) {
     const value = this.#elements.entries.value;
-    if (mode === MODE.training) this.#preferences.exercises = value;
-    else this.#preferences.names = value;
+    if (mode === MODE.training) {
+      if (!this.#showingDefaultExercises) this.#preferences.exercises = value;
+    } else {
+      this.#preferences.names = value;
+    }
   }
 
-  #savedMinutesFor(mode) {
-    const saved =
-      mode === MODE.training
-        ? this.#preferences.minutesPerExercise
-        : this.#preferences.minutesPerPerson;
-    return saved ?? clampMinutesPerPerson(null);
+  #savedDurationFor(mode) {
+    return mode === MODE.training
+      ? this.#preferences.secondsPerExercise ?? clampSecondsPerExercise(null)
+      : this.#preferences.minutesPerPerson ?? clampMinutesPerPerson(null);
   }
 
-  #saveMinutesFor(mode) {
-    const value = this.minutesPerItem;
-    if (mode === MODE.training) this.#preferences.minutesPerExercise = value;
-    else this.#preferences.minutesPerPerson = value;
+  /** Called before the mode flips, so the field still holds the old unit. */
+  #saveDurationFor(mode) {
+    if (mode === MODE.training) this.#preferences.secondsPerExercise = this.secondsPerItem;
+    else this.#preferences.minutesPerPerson = this.#minutesPerPerson;
   }
 
   #reflectMode() {
@@ -249,7 +399,18 @@ export class SetupScreen {
     // Rest belongs to a workout; running order belongs to a stand-up, where a
     // workout's sequence is deliberate and must not be shuffled.
     this.#elements.restField.hidden = !training;
+    this.#elements.blockRestField.hidden = !training;
+    // Same field, different unit: seconds in steps of 5, or minutes in halves.
+    const field = this.#elements.minutes;
+    field.min = training ? MIN_SECONDS_PER_EXERCISE : "0.5";
+    field.max = training ? MAX_SECONDS_PER_EXERCISE : "10";
+    field.step = training ? "5" : "0.5";
     this.#elements.orderField.hidden = training;
+    // A programme day replaces the box with its preview.
+    const day = this.#selectedDay !== null;
+    this.#elements.workoutField.hidden = !training;
+    this.#elements.entries.hidden = day;
+    this.#elements.workoutPreview.hidden = !day;
   }
 
   #setOrder(order) {

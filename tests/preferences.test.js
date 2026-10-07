@@ -5,8 +5,11 @@ import {
   Preferences,
   clampMinutesPerPerson,
   clampRestSeconds,
+  clampBlockRestSeconds,
+  clampSecondsPerExercise,
   DEFAULT_MINUTES_PER_PERSON,
-  DEFAULT_REST_SECONDS
+  DEFAULT_REST_SECONDS,
+  DEFAULT_BLOCK_REST_SECONDS
 } from "../src/js/services/preferences.js";
 
 /** A localStorage that works, so the round-trips can be checked. */
@@ -90,8 +93,39 @@ describe("Preferences with working storage", () => {
   test("an unset duration reports null, so a caller can pick its own default", () => {
     const prefs = new Preferences();
     assert.equal(prefs.minutesPerPerson, null);
-    assert.equal(prefs.minutesPerExercise, null);
+    assert.equal(prefs.secondsPerExercise, null);
     assert.equal(prefs.restSeconds, null);
+  });
+
+  test("an unsaved exercise list reports null, so the default workout can be offered", () => {
+    const prefs = new Preferences();
+    assert.equal(prefs.exercises, null);
+    prefs.exercises = "";
+    assert.equal(prefs.exercises, "", "an emptied list stays empty");
+  });
+
+  test("seconds per exercise are clamped, and nonsense falls back to 20", () => {
+    assert.equal(clampSecondsPerExercise(1), 5);
+    assert.equal(clampSecondsPerExercise(9999), 600);
+    assert.equal(clampSecondsPerExercise("abc"), 20);
+  });
+
+  test("the block rest has its own default and is clamped like the rest", () => {
+    const prefs = new Preferences();
+    assert.equal(prefs.blockRestSeconds, null);
+    prefs.blockRestSeconds = 9999;
+    assert.equal(prefs.blockRestSeconds, 300);
+    assert.equal(clampBlockRestSeconds("abc"), DEFAULT_BLOCK_REST_SECONDS);
+    assert.equal(clampBlockRestSeconds(0), 0);
+  });
+
+  test("the programme day is remembered, and your own list is the default", () => {
+    const prefs = new Preferences();
+    assert.equal(prefs.workoutDay, null);
+    prefs.workoutDay = 4;
+    assert.equal(prefs.workoutDay, 4);
+    prefs.workoutDay = null;
+    assert.equal(prefs.workoutDay, null);
   });
 
   test("the two modes keep separate lists and durations", () => {
@@ -99,11 +133,11 @@ describe("Preferences with working storage", () => {
     prefs.names = "Anna";
     prefs.exercises = "Squats";
     prefs.minutesPerPerson = 1.5;
-    prefs.minutesPerExercise = 0.5;
+    prefs.secondsPerExercise = 20;
     assert.equal(prefs.names, "Anna");
     assert.equal(prefs.exercises, "Squats");
     assert.equal(prefs.minutesPerPerson, 1.5);
-    assert.equal(prefs.minutesPerExercise, 0.5);
+    assert.equal(prefs.secondsPerExercise, 20);
   });
 
   test("only the known enum values are accepted back", () => {
@@ -125,6 +159,18 @@ describe("upgrading from an earlier version", () => {
     // Getting this wrong silently resets someone's preference on upgrade.
     useStorage(workingStorage({ "tiu.order": "alpha" }));
     assert.equal(new Preferences().order, "alphabetical");
+  });
+
+  test("minutes per exercise saved before 1.4.0 come back as seconds", () => {
+    useStorage(workingStorage({ "tiu.exerciseMinutes": "0.5" }));
+    assert.equal(new Preferences().secondsPerExercise, 30);
+  });
+
+  test("once seconds are saved, the old minutes are ignored", () => {
+    useStorage(workingStorage({ "tiu.exerciseMinutes": "1.5" }));
+    const prefs = new Preferences();
+    prefs.secondsPerExercise = 20;
+    assert.equal(prefs.secondsPerExercise, 20);
   });
 
   test("the current spelling still works", () => {

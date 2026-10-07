@@ -52,6 +52,33 @@ export class Chime {
     }
   }
 
+  /** Several tones in sequence, each its own pitch. */
+  #melody(frequencies) {
+    try {
+      const context = this.#context();
+      if (!context) return;
+      const startedAt = context.currentTime;
+      frequencies.forEach((frequency, index) => {
+        const oscillator = context.createOscillator();
+        const gain = context.createGain();
+        oscillator.type = "triangle";
+        oscillator.frequency.value = frequency;
+        oscillator.connect(gain).connect(context.destination);
+
+        const at = startedAt + index * 0.14;
+        // The last note rings on, so the phrase lands rather than stops.
+        const length = index === frequencies.length - 1 ? 0.5 : 0.16;
+        gain.gain.setValueAtTime(0.0001, at);
+        gain.gain.exponentialRampToValueAtTime(0.3, at + 0.02);
+        gain.gain.exponentialRampToValueAtTime(0.0001, at + length);
+        oscillator.start(at);
+        oscillator.stop(at + length + 0.02);
+      });
+    } catch {
+      // No audio output available.
+    }
+  }
+
   /** One tick per digit of the start countdown. */
   countdownTick() {
     this.#tone(1, 620);
@@ -60,6 +87,11 @@ export class Chime {
   /** The count-in is over and the first person is up. */
   turnStarting() {
     this.#tone(2, 920);
+  }
+
+  /** A workout moves on to its next block: a short rising fanfare. */
+  blockChange() {
+    this.#melody([523, 659, 784, 1047]);
   }
 
   /** A speaker's time has run out. */

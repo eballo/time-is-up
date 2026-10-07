@@ -43,10 +43,18 @@ carries its own accent so you can tell the two apart across a room.
 - **Estimate** — shown under the button: `N people · X min each · ~Y min total`
   (flagged as approximate in manual mode).
 
-In training mode the list becomes **Exercises**, the duration becomes minutes
-per exercise, and **Rest between exercises** replaces the order control — a
+In training mode the list becomes **Exercises**, the duration becomes seconds
+per exercise (20 by default), and **Rest between exercises** replaces the order control — a
 workout's sequence is deliberate, so it runs as written. Rest is in seconds; 0
-runs the exercises back to back.
+runs the exercises back to back. A blank line in the list starts a new block:
+the screen shows which block you are in, and the rest leading into the next
+one announces it. Until you edit it, the list holds a ready-made three-block
+dumbbell workout (20 s per exercise, 30 s rest) in the language you picked.
+
+The **Routine** picker swaps your list for a day of the built-in 12-day
+programme: three blocks a day, each pair of exercises done three times through,
+every exercise with a short description of how to do it — shown in the setup
+preview and under the exercise's name while it runs.
 
 ### During a round
 

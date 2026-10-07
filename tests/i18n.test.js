@@ -119,6 +119,17 @@ describe("strings the interface splits or joins", () => {
     }
   });
 
+  test("the default workout is the same three blocks in every language", () => {
+    for (const language of languages) {
+      const blocks = String(language.strings.exercisesDefault).split("\n\n");
+      assert.deepEqual(
+        blocks.map((block) => block.split("\n").length),
+        [6, 6, 6],
+        `${language.code} exercisesDefault`
+      );
+    }
+  });
+
   test("the manual-mode suffix keeps its leading space", () => {
     // It is appended straight onto the estimate.
     for (const language of languages) {
