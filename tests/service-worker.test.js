@@ -57,6 +57,13 @@ describe("sw.js", async () => {
     }
   });
 
+  test("asks the server rather than the HTTP cache, so a deploy never mixes versions", () => {
+    // Precaching from a stale HTTP cache would bake old files into the release.
+    assert.match(source, /cache: "reload"/);
+    // And every request is revalidated, or a new module can meet an old one.
+    assert.match(source, /cache: "no-cache"/);
+  });
+
   test("the page, the styles and the manifest are precached", () => {
     for (const path of ["./", "index.html", "src/css/styles.css", "manifest.webmanifest"]) {
       assert.ok(shell.includes(path), `${path} missing from APP_SHELL`);
