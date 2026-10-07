@@ -76,6 +76,16 @@ export class Translator {
     return this.#count(count, "exerciseOne", "exerciseOther");
   }
 
+  /** "1 day" / "3 days", in the active language. */
+  countDays(count) {
+    return this.#count(count, "dayOne", "dayOther");
+  }
+
+  /** "1 workout" / "12 workouts", in the active language. */
+  countWorkouts(count) {
+    return this.#count(count, "workoutOne", "workoutOther");
+  }
+
   #count(count, singularKey, pluralKey) {
     return `${count} ${this.translate(count === 1 ? singularKey : pluralKey)}`;
   }

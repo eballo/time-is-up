@@ -119,6 +119,18 @@ describe("Preferences with working storage", () => {
     assert.equal(clampBlockRestSeconds(0), 0);
   });
 
+  test("the workout history round-trips, and starts empty", () => {
+    const prefs = new Preferences();
+    assert.deepEqual(prefs.history, []);
+    prefs.history = [{ date: "2026-10-07", day: 1 }];
+    assert.deepEqual(prefs.history, [{ date: "2026-10-07", day: 1 }]);
+  });
+
+  test("a corrupted history reads as empty rather than breaking the page", () => {
+    useStorage(workingStorage({ "tiu.history": "{not json" }));
+    assert.deepEqual(new Preferences().history, []);
+  });
+
   test("the programme day is remembered, and your own list is the default", () => {
     const prefs = new Preferences();
     assert.equal(prefs.workoutDay, null);

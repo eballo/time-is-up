@@ -792,3 +792,12 @@ input[type="number"] {
 .workout-block li.has-figure { display: flex; gap: 10px; align-items: center; }
 .workout-block li.has-figure .figure { width: 52px; height: 52px; flex: 0 0 auto; }
 .workout-block li .text { min-width: 0; }
+
+/* ---- History ---- */
+.history-line { margin: 8px 0 0; }
+.done-streak {
+  margin-top: 10px;
+  font-size: 18px;
+  font-weight: 700;
+  color: var(--accent);
+}

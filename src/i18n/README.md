@@ -98,6 +98,11 @@ the programme shows in English.
 | `workoutDay` | one picker option per programme day | `{n}`, `{title}` |
 | `workoutHint` | hint beside the exercises while a day is chosen | `{rounds}` |
 | `blockTitle` | heading of each block in the day's preview | `{i}`, `{title}` |
+| `historyStreak` | the current streak, in setup and on the final screen | `{days}` |
+| `historyBest` | the longest streak ever, in setup | `{days}` |
+| `historyNone` | shown in setup until the first workout is finished | |
+| `dayOne` / `dayOther` | plural of "day" | 1 vs. the rest |
+| `workoutOne` / `workoutOther` | plural of "workout" | 1 vs. the rest |
 | `workoutDone` | title of the final screen, training mode | |
 | `doneSubTraining` | subtitle of the training summary | `{items}`, `{worked}`, `{total}` |
 | `getReady` | text above the 5s countdown | |

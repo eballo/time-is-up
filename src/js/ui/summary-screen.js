@@ -23,8 +23,20 @@ export class SummaryScreen {
     this.#elements.again.textContent = this.#translator.translate("restart");
   }
 
-  render(session, mode) {
+  /**
+   * @param {number|null} streak  the training streak including this workout,
+   *   or null when there is none to show (a stand-up).
+   */
+  render(session, mode, streak = null) {
     this.renderText(mode);
+
+    const streakLine = this.#elements.streak;
+    streakLine.hidden = streak === null;
+    if (streak !== null) {
+      streakLine.textContent = this.#translator.format("historyStreak", {
+        days: this.#translator.countDays(streak)
+      });
+    }
 
     const results = session.results;
     const total = session.totalSpentSeconds;

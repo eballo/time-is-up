@@ -8,6 +8,7 @@
 import { languages, FALLBACK_LANGUAGE } from "../i18n/index.js";
 
 import { Session, orderNames } from "./core/session.js";
+import { currentStreak, localDateKey, withEntry } from "./core/history.js";
 import { TurnTimer } from "./core/turn-timer.js";
 
 import { Chime } from "./services/chime.js";
@@ -198,10 +199,27 @@ export class App {
     this.#timer.stop();
     this.#wakeLock.release();
     this.#tabTitle.reset();
-    this.#summaryScreen.render(this.#session, this.#setupScreen.mode);
+    const streak = this.#setupScreen.isTraining ? this.#recordWorkout() : null;
+    this.#summaryScreen.render(this.#session, this.#setupScreen.mode, streak);
     this.#chime.sessionFinished();
     this.#showScreen(SCREEN.summary);
     this.#fireworks.launch();
+  }
+
+  /**
+   * Log a finished workout and return the streak it makes. Only a run that
+   * reaches its end gets here; one abandoned with Reset is not a workout done.
+   */
+  #recordWorkout() {
+    const history = withEntry(this.#preferences.history, {
+      date: localDateKey(new Date()),
+      day: this.#setupScreen.workoutDay,
+      exercises: this.#session.results.length,
+      workedSeconds: this.#session.workedSpentSeconds,
+      totalSeconds: this.#session.totalSpentSeconds
+    });
+    this.#preferences.history = history;
+    return currentStreak(history);
   }
 
   #togglePause() {
@@ -229,7 +247,8 @@ export class App {
     this.#tabTitle.reset();
     this.#session = null;
     this.#showScreen(SCREEN.setup);
-    this.#setupScreen.refreshEstimate();
+    // renderText, not just the estimate: a workout may have just been logged.
+    this.#setupScreen.renderText();
   }
 
   #renderClock() {
@@ -297,7 +316,10 @@ export class App {
       this.#runningScreen.renderSegment(this.#session, this.#viewOptions);
       this.#renderClock();
     } else if (this.#screen === SCREEN.summary && this.#session) {
-      this.#summaryScreen.render(this.#session, this.#setupScreen.mode);
+      const streak = this.#setupScreen.isTraining
+        ? currentStreak(this.#preferences.history)
+        : null;
+      this.#summaryScreen.render(this.#session, this.#setupScreen.mode, streak);
     }
   }
 

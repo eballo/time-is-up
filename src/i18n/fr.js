@@ -89,6 +89,13 @@ export default {
     workoutDay: "Jour {n} · {title}",
     workoutHint: "— chaque bloc se fait {rounds} fois de suite (A, B, A, B…).",
     blockTitle: "Bloc {i} : {title}",
+    historyStreak: "🔥 Série de {days}",
+    historyBest: "record : {days}",
+    historyNone: "Aucun entraînement terminé pour l'instant. Aujourd'hui peut être le premier !",
+    dayOne: "jour",
+    dayOther: "jours",
+    workoutOne: "entraînement",
+    workoutOther: "entraînements",
     workoutDone: "💪 Séance terminée",
     doneSubTraining: "{items} · {worked} d'effort · {total} au total"
   }

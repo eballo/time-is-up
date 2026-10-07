@@ -89,6 +89,13 @@ export default {
     workoutDay: "Dag {n} · {title}",
     workoutHint: "— elk blok doe je {rounds} keer achter elkaar (A, B, A, B…).",
     blockTitle: "Blok {i}: {title}",
+    historyStreak: "🔥 Reeks van {days}",
+    historyBest: "beste: {days}",
+    historyNone: "Nog geen training afgerond. Vandaag kan de eerste zijn!",
+    dayOne: "dag",
+    dayOther: "dagen",
+    workoutOne: "training",
+    workoutOther: "trainingen",
     workoutDone: "💪 Training klaar",
     doneSubTraining: "{items} · {worked} actief · {total} in totaal"
   }
