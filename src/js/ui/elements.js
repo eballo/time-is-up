@@ -33,6 +33,7 @@ export function collectElements() {
       workout: byId("workout"),
       workoutLabel: byId("lbl-workout"),
       workoutPreview: byId("workout-preview"),
+      historyLine: byId("history-line"),
       restField: byId("field-rest"),
       rest: byId("rest"),
       restLabel: byId("lbl-rest"),
@@ -86,6 +87,7 @@ export function collectElements() {
     summary: {
       title: byId("done-title"),
       subtitle: byId("done-sub"),
+      streak: byId("done-streak"),
       list: byId("summary"),
       again: byId("again")
     },

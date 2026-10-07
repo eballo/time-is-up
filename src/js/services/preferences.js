@@ -1,8 +1,11 @@
+import { sanitizeHistory } from "../core/history.js";
+
 const KEYS = {
   mode: "tiu.appMode",
   names: "tiu.names",
   exercises: "tiu.exercises",
   workoutDay: "tiu.workoutDay",
+  history: "tiu.history",
   secondsPerExercise: "tiu.exerciseSeconds",
   /** What versions up to 1.3.0 kept instead, in minutes. Read, never written. */
   minutesPerExercise: "tiu.exerciseMinutes",
@@ -96,6 +99,19 @@ export class Preferences {
 
   set names(value) {
     this.#write(KEYS.names, value);
+  }
+
+  /** Finished workouts, oldest first; whatever is unreadable is dropped. */
+  get history() {
+    try {
+      return sanitizeHistory(JSON.parse(this.#read(KEYS.history) ?? "[]"));
+    } catch {
+      return [];
+    }
+  }
+
+  set history(entries) {
+    this.#write(KEYS.history, JSON.stringify(entries));
   }
 
   get minutesPerPerson() {

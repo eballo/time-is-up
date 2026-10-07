@@ -2,6 +2,7 @@ import { createElement, replaceChildren } from "../util/dom.js";
 import { Session, parseBlocks, parseLines, workoutDayBlocks } from "../core/session.js";
 import { workoutsFor, ROUNDS_PER_BLOCK } from "../../i18n/workouts/index.js";
 import { createFigure, figuresForDay } from "./exercise-figures.js";
+import { bestStreak, completedProgrammeDays, currentStreak } from "../core/history.js";
 import {
   clampMinutesPerPerson,
   clampRestSeconds,
@@ -77,6 +78,11 @@ export class SetupScreen {
     const blocks = this.workoutBlocks;
     if (blocks) return blocks.flatMap((block) => block.items.map((item) => item.label));
     return parseLines(this.#elements.entries.value);
+  }
+
+  /** The programme day chosen (1-based), or null for your own list. */
+  get workoutDay() {
+    return this.#selectedDay ? this.#workoutDay : null;
   }
 
   /** The chosen programme day, ready for Session.forTraining; null otherwise. */
@@ -159,6 +165,7 @@ export class SetupScreen {
     el.workoutLabel.textContent = t("workoutLabel");
     this.#renderWorkoutPicker();
     this.#renderWorkoutPreview();
+    this.#renderHistory();
     el.minutesLabel.textContent = t(training ? "secondsPerExerciseLabel" : "minutesLabel");
     el.restLabel.textContent = t("restLabel");
     el.restHint.textContent = t("restHint");
@@ -231,7 +238,22 @@ export class SetupScreen {
     return text;
   }
 
+  /** Streak, best streak and how many workouts — or a nudge before the first. */
+  #renderHistory() {
+    const history = this.#preferences.history;
+    const tr = this.#translator;
+    this.#elements.historyLine.textContent = history.length
+      ? [
+          tr.format("historyStreak", { days: tr.countDays(currentStreak(history)) }),
+          tr.format("historyBest", { days: tr.countDays(bestStreak(history)) }),
+          tr.countWorkouts(history.length)
+        ].join(" · ")
+      : tr.translate("historyNone");
+  }
+
   #renderWorkoutPicker() {
+    // Days already finished carry a tick, so the programme shows its progress.
+    const done = completedProgrammeDays(this.#preferences.history);
     const fragment = document.createDocumentFragment();
     const custom = createElement("option", null, this.#translator.translate("workoutCustom"));
     custom.value = "";
@@ -240,7 +262,8 @@ export class SetupScreen {
       const option = createElement(
         "option",
         null,
-        this.#translator.format("workoutDay", { n: index + 1, title: day.title })
+        this.#translator.format("workoutDay", { n: index + 1, title: day.title }) +
+          (done.has(index + 1) ? " ✓" : "")
       );
       option.value = String(index + 1);
       fragment.appendChild(option);

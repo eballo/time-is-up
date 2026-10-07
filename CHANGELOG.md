@@ -44,6 +44,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   shared between days, seen side on, from the front or lying down as each
   exercise reads best.
 
+- **Workout history and streak.** Every workout run to its end is logged in the
+  browser's localStorage (date, programme day, exercises, time) — never one
+  abandoned with Reset. Setup shows the current streak, the best one and the
+  number of workouts; the final screen shows the streak including the workout
+  just done; programme days already finished carry a ✓ in the picker. A
+  streak that reached yesterday stays alive until a whole day goes by.
+
 ### Changed
 
 - **Training durations are in seconds.** *Seconds per exercise* replaces

@@ -124,6 +124,17 @@ export default {
     workoutHint: "— each block is done {rounds} times through (A, B, A, B…).",
     // heading of each block in the day's preview
     blockTitle: "Block {i}: {title}",
+    /* history: finished workouts and the streak, kept in localStorage */
+    // {days} = "3 days"
+    historyStreak: "🔥 {days} streak",
+    // the longest streak ever; {days} = "5 days"
+    historyBest: "best: {days}",
+    // shown instead until the first workout is finished
+    historyNone: "No workouts finished yet. Today could be the first!",
+    dayOne: "day",
+    dayOther: "days",
+    workoutOne: "workout",
+    workoutOther: "workouts",
     workoutDone: "\ud83d\udcaa Workout finished",
     // {worked} = time actually exercising, {total} = including rests
     doneSubTraining: "{items} \u00b7 {worked} working \u00b7 {total} in total"

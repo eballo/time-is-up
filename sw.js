@@ -36,6 +36,7 @@ const APP_SHELL = [
   "src/css/styles.css",
   "src/js/app.js",
   "src/js/version.js",
+  "src/js/core/history.js",
   "src/js/core/session.js",
   "src/js/core/turn-timer.js",
   "src/js/services/chime.js",

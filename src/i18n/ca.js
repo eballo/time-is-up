@@ -89,6 +89,13 @@ export default {
     workoutDay: "Dia {n} · {title}",
     workoutHint: "— cada bloc es fa {rounds} vegades seguides (A, B, A, B…).",
     blockTitle: "Bloc {i}: {title}",
+    historyStreak: "🔥 Ratxa de {days}",
+    historyBest: "millor: {days}",
+    historyNone: "Encara no has acabat cap entrenament. Avui pot ser el primer!",
+    dayOne: "dia",
+    dayOther: "dies",
+    workoutOne: "entrenament",
+    workoutOther: "entrenaments",
     workoutDone: "💪 Entrenament acabat",
     doneSubTraining: "{items} · {worked} d'exercici · {total} en total"
   }
