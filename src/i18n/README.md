@@ -27,6 +27,15 @@ If someone had that language stored in their browser, it falls back automaticall
 to the fallback language (English, or the first registered one if English is not
 present).
 
+## The training programme
+
+The day-by-day workouts live apart from the interface strings, in
+`src/i18n/workouts/<code>.js`: an array of days, each with a title and blocks,
+each block with a title and its exercises as `[name, description]`. Every file
+holds the same days in the same order, and a test checks that they line up.
+Register a new language's file in `src/i18n/workouts/index.js`; without one,
+the programme shows in English.
+
 ## How it works
 
 - Each language file default-exports `{ code, label, strings }`.
@@ -68,7 +77,8 @@ present).
 | `modeStandup` / `modeTraining` | the two mode tabs | |
 | `exercises` / `exercisesHint` | label and hint of the exercise list | |
 | `exercisesPlaceholder` | example exercises | separate lines with `\n` |
-| `minutesPerExerciseLabel` | label of the duration field in training | |
+| `exercisesDefault` | the workout the list starts with until it is edited | `\n` between exercises, `\n\n` between blocks |
+| `secondsPerExerciseLabel` | label of the duration field in training (seconds) | |
 | `restLabel` / `restHint` | the rest field and the note under it | |
 | `addExercises` | shown when the exercise list is empty | |
 | `estimateTraining` | summary under the button, training mode | `{items}`, `{min}`, `{rest}`, `{total}` |
@@ -78,6 +88,16 @@ present).
 | `restingNow` | eyebrow while resting | |
 | `skipRest` | the forward button during a rest | |
 | `lastExercise` | shown instead of "next" on the last exercise | |
+| `blockStarting` | names an untitled block during the change into it | `{i}` |
+| `blockChange` | big text during the rest between two blocks | |
+| `letsGo` | replaces `blockChange` for the last 3 seconds of that rest | |
+| `blockRestLabel` / `blockRestHint` | the rest-between-blocks field and the note beside it | |
+| `blockXofY` | prefixed to `exerciseXofY` when the list has blocks | `{i}`, `{n}` |
+| `workoutLabel` | label of the routine picker in training | |
+| `workoutCustom` | the picker option that runs your own list | |
+| `workoutDay` | one picker option per programme day | `{n}`, `{title}` |
+| `workoutHint` | hint beside the exercises while a day is chosen | `{rounds}` |
+| `blockTitle` | heading of each block in the day's preview | `{i}`, `{title}` |
 | `workoutDone` | title of the final screen, training mode | |
 | `doneSubTraining` | subtitle of the training summary | `{items}`, `{worked}`, `{total}` |
 | `getReady` | text above the 5s countdown | |

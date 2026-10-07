@@ -7,6 +7,50 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+- **A default workout.** Training mode no longer starts empty: until you edit
+  it, the list holds a three-block dumbbell workout (military press and squats,
+  rows and lunges, push-ups and Russian twists, each pair three times over),
+  translated into every language, with 20 seconds per exercise and 30 seconds
+  of rest. It follows the language picker and is never saved; the first edit
+  makes the list yours.
+- **Blocks.** A blank line in the exercise list starts a new block. The running
+  screen shows "Block 2 of 3" beside the exercise count, and the queue lists
+  only the block in hand.
+- **Block changes.** The rest between two blocks has its own, longer duration
+  (*Rest between blocks*, 60 s by default) and is made an event of: a rising
+  fanfare, "Block change!" popping in the new block's colour with the block's
+  name beneath it, and for the last three seconds a tick per second and
+  "Let's go!".
+- **A 12-day programme.** A *Routine* picker in training mode offers your own
+  list or one of twelve days, each three blocks of two exercises done three
+  times through (A, B, A, B, A, B). Picking a day shows its blocks with a short
+  description of every exercise; while it runs, the description sits under the
+  exercise's name (during a rest, the next one's), and the block's name heads
+  the screen. The programme lives in `src/i18n/workouts/`, one file per
+  language, all five translated. The chosen day is remembered.
+- **A colour per block.** When a workout has more than one block, each block
+  wears its own colour (blue, pink, orange, violet): a band across the top of
+  the running screen and the block's name as a tag, a stripe beside every
+  exercise in the queue, and the same colours in the setup preview, so it is
+  clear at a glance which block you are in.
+- **Exercise figures.** Every exercise in the programme is shown as an
+  animated stick figure, moving between where the exercise starts and where it
+  ends, beside the clock while it runs (during a rest, the one coming up) and
+  as a thumbnail in the setup preview. They are inline SVG in the block's
+  colour, so they cost no downloads and work offline; with reduced motion they
+  stand still in the end pose. All twelve days have them: 66 figures, some
+  shared between days, seen side on, from the front or lying down as each
+  exercise reads best.
+
+### Changed
+
+- **Training durations are in seconds.** *Seconds per exercise* replaces
+  minutes per exercise, 20 s by default, in steps of 5. A duration saved in
+  minutes by an earlier version is converted rather than lost. Stand-ups keep
+  minutes per person.
+
 ## [1.3.0] - 2026-09-18
 
 ### Added

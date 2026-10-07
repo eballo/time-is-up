@@ -60,11 +60,17 @@ export default {
     modeTraining: "Entrenament",
     changeModeTraining: "Canvi d'activitat",
     exercises: "Exercicis",
-    exercisesHint: "— un per línia, en l'ordre que els faràs.",
+    exercisesHint: "— un per línia, en l'ordre que els faràs. Una línia en blanc separa els blocs.",
     exercisesPlaceholder: "Flexions\nEsquats\nPlanxa\nZancades",
-    minutesPerExerciseLabel: "Minuts per exercici",
+    exercisesDefault:
+      "Press militar\nEsquats amb manuelles\nPress militar\nEsquats amb manuelles\nPress militar\nEsquats amb manuelles\n\n" +
+      "Rem amb manuelles\nGambades amb manuelles\nRem amb manuelles\nGambades amb manuelles\nRem amb manuelles\nGambades amb manuelles\n\n" +
+      "Flexions\nGirs russos\nFlexions\nGirs russos\nFlexions\nGirs russos",
+    secondsPerExerciseLabel: "Segons per exercici",
     restLabel: "Descans entre exercicis",
     restHint: "segons · 0 per encadenar-los",
+    blockRestLabel: "Descans entre blocs",
+    blockRestHint: "segons · el canvi de bloc",
     addExercises: "Afegeix exercicis per començar.",
     estimateTraining: "{items} · {min} cadascun · {rest} de descans · ~{total} en total",
     restNone: "sense descans",
@@ -74,6 +80,15 @@ export default {
     restingNow: "Descans",
     skipRest: "Salta el descans",
     lastExercise: "Últim exercici",
+    blockStarting: "Comencem el bloc {i}",
+    blockXofY: "Bloc {i} de {n}",
+    blockChange: "Canvi de bloc!",
+    letsGo: "Som-hi!",
+    workoutLabel: "Rutina",
+    workoutCustom: "Llista pròpia",
+    workoutDay: "Dia {n} · {title}",
+    workoutHint: "— cada bloc es fa {rounds} vegades seguides (A, B, A, B…).",
+    blockTitle: "Bloc {i}: {title}",
     workoutDone: "💪 Entrenament acabat",
     doneSubTraining: "{items} · {worked} d'exercici · {total} en total"
   }

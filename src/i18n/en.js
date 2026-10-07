@@ -60,11 +60,17 @@ export default {
     modeTraining: "Training",
     changeModeTraining: "Activity switching",
     exercises: "Exercises",
-    exercisesHint: "— one per line, in the order you'll do them.",
+    exercisesHint: "— one per line, in the order you'll do them. A blank line starts a new block.",
     exercisesPlaceholder: "Push-ups\nSquats\nPlank\nLunges",
-    minutesPerExerciseLabel: "Minutes per exercise",
+    exercisesDefault:
+      "Military press\nDumbbell squats\nMilitary press\nDumbbell squats\nMilitary press\nDumbbell squats\n\n" +
+      "Dumbbell rows\nDumbbell lunges\nDumbbell rows\nDumbbell lunges\nDumbbell rows\nDumbbell lunges\n\n" +
+      "Push-ups\nRussian twists\nPush-ups\nRussian twists\nPush-ups\nRussian twists",
+    secondsPerExerciseLabel: "Seconds per exercise",
     restLabel: "Rest between exercises",
     restHint: "seconds · 0 to run them back to back",
+    blockRestLabel: "Rest between blocks",
+    blockRestHint: "seconds · the block change",
     addExercises: "Add exercises to get started.",
     estimateTraining: "{items} · {min} each · {rest} rest · ~{total} total",
     restNone: "no rest",
@@ -74,6 +80,15 @@ export default {
     restingNow: "Rest",
     skipRest: "Skip rest",
     lastExercise: "Last exercise",
+    blockStarting: "Starting block {i}",
+    blockXofY: "Block {i} of {n}",
+    blockChange: "Block change!",
+    letsGo: "Let's go!",
+    workoutLabel: "Routine",
+    workoutCustom: "My own list",
+    workoutDay: "Day {n} · {title}",
+    workoutHint: "— each block is done {rounds} times through (A, B, A, B…).",
+    blockTitle: "Block {i}: {title}",
     workoutDone: "💪 Workout finished",
     doneSubTraining: "{items} · {worked} working · {total} in total"
   }

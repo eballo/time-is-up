@@ -85,13 +85,21 @@ export default {
     modeTraining: "Training",
     changeModeTraining: "Activity switching",
     exercises: "Exercises",
-    exercisesHint: "\u2014 one per line, in the order you'll do them.",
+    exercisesHint: "\u2014 one per line, in the order you'll do them. A blank line starts a new block.",
     exercisesPlaceholder: "Push-ups\nSquats\nPlank\nLunges",
-    minutesPerExerciseLabel: "Minutes per exercise",
+    // the workout the list starts with; a blank line ("\n\n") separates blocks
+    exercisesDefault:
+      "Military press\nDumbbell squats\nMilitary press\nDumbbell squats\nMilitary press\nDumbbell squats\n\n" +
+      "Dumbbell rows\nDumbbell lunges\nDumbbell rows\nDumbbell lunges\nDumbbell rows\nDumbbell lunges\n\n" +
+      "Push-ups\nRussian twists\nPush-ups\nRussian twists\nPush-ups\nRussian twists",
+    secondsPerExerciseLabel: "Seconds per exercise",
     restLabel: "Rest between exercises",
     restHint: "seconds \u00b7 0 to run them back to back",
+    // the longer rest that replaces the ordinary one between two blocks
+    blockRestLabel: "Rest between blocks",
+    blockRestHint: "seconds · the block change",
     addExercises: "Add exercises to get started.",
-    // {items} = "4 exercises", {min} = "0.5 min", {rest} = "30 s", {total} = "4 min"
+    // {items} = "4 exercises", {min} = "20 s", {rest} = "30 s", {total} = "4 min"
     estimateTraining: "{items} \u00b7 {min} each \u00b7 {rest} rest \u00b7 ~{total} total",
     restNone: "no rest",
     exerciseOne: "exercise",
@@ -100,6 +108,22 @@ export default {
     restingNow: "Rest",
     skipRest: "Skip rest",
     lastExercise: "Last exercise",
+    // {i} = the block about to start, shown during the rest leading into it
+    blockStarting: "Starting block {i}",
+    // {i}, {n} — prefixed to the exercise count when the list has blocks
+    blockXofY: "Block {i} of {n}",
+    // big text during the rest between blocks, then for its last 3 seconds
+    blockChange: "Block change!",
+    letsGo: "Let's go!",
+    workoutLabel: "Routine",
+    // the first option of the routine picker: run the list typed in the box
+    workoutCustom: "My own list",
+    // {n} = day number, {title} = that day's title from src/i18n/workouts
+    workoutDay: "Day {n} · {title}",
+    // replaces exercisesHint while a programme day is chosen
+    workoutHint: "— each block is done {rounds} times through (A, B, A, B…).",
+    // heading of each block in the day's preview
+    blockTitle: "Block {i}: {title}",
     workoutDone: "\ud83d\udcaa Workout finished",
     // {worked} = time actually exercising, {total} = including rests
     doneSubTraining: "{items} \u00b7 {worked} working \u00b7 {total} in total"

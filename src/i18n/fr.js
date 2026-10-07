@@ -60,11 +60,17 @@ export default {
     modeTraining: "Entraînement",
     changeModeTraining: "Changement d'activité",
     exercises: "Exercices",
-    exercisesHint: "— un par ligne, dans l'ordre où vous les ferez.",
+    exercisesHint: "— un par ligne, dans l'ordre où vous les ferez. Une ligne vide sépare les blocs.",
     exercisesPlaceholder: "Pompes\nSquats\nGainage\nFentes",
-    minutesPerExerciseLabel: "Minutes par exercice",
+    exercisesDefault:
+      "Développé militaire\nSquats avec haltères\nDéveloppé militaire\nSquats avec haltères\nDéveloppé militaire\nSquats avec haltères\n\n" +
+      "Rowing avec haltères\nFentes avec haltères\nRowing avec haltères\nFentes avec haltères\nRowing avec haltères\nFentes avec haltères\n\n" +
+      "Pompes\nRussian twists\nPompes\nRussian twists\nPompes\nRussian twists",
+    secondsPerExerciseLabel: "Secondes par exercice",
     restLabel: "Repos entre les exercices",
     restHint: "secondes · 0 pour enchaîner",
+    blockRestLabel: "Repos entre les blocs",
+    blockRestHint: "secondes · le changement de bloc",
     addExercises: "Ajoutez des exercices pour commencer.",
     estimateTraining: "{items} · {min} chacun · {rest} de repos · ~{total} au total",
     restNone: "sans repos",
@@ -74,6 +80,15 @@ export default {
     restingNow: "Repos",
     skipRest: "Passer le repos",
     lastExercise: "Dernier exercice",
+    blockStarting: "On attaque le bloc {i}",
+    blockXofY: "Bloc {i} / {n}",
+    blockChange: "Changement de bloc !",
+    letsGo: "C'est parti !",
+    workoutLabel: "Programme",
+    workoutCustom: "Ma propre liste",
+    workoutDay: "Jour {n} · {title}",
+    workoutHint: "— chaque bloc se fait {rounds} fois de suite (A, B, A, B…).",
+    blockTitle: "Bloc {i} : {title}",
     workoutDone: "💪 Séance terminée",
     doneSubTraining: "{items} · {worked} d'effort · {total} au total"
   }

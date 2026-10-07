@@ -14,6 +14,12 @@
   --warn: #d99400;
   --danger: #d1453b;
   --rest: #0e7490;
+  /* One colour per block of a workout. Kept clear of the clock's green, amber
+     and red and of the rest's cyan, which already mean something. */
+  --block-1: #2563eb;
+  --block-2: #db2777;
+  --block-3: #ea580c;
+  --block-4: #7c3aed;
   --shadow: 0 1px 3px rgba(0, 0, 0, .08), 0 8px 24px rgba(0, 0, 0, .06);
   --radius: 14px;
 }
@@ -35,6 +41,10 @@
     --warn: #ecb03e;
     --danger: #f0655c;
     --rest: #22d3ee;
+    --block-1: #60a5fa;
+    --block-2: #f472b6;
+    --block-3: #fb923c;
+    --block-4: #a78bfa;
     --shadow: 0 1px 3px rgba(0, 0, 0, .3), 0 12px 32px rgba(0, 0, 0, .35);
   }
   :root[data-mode="training"]:not([data-theme="light"]) { --accent: #a78bfa; }
@@ -51,6 +61,10 @@
   --warn: #ecb03e;
   --danger: #f0655c;
   --rest: #22d3ee;
+  --block-1: #60a5fa;
+  --block-2: #f472b6;
+  --block-3: #fb923c;
+  --block-4: #a78bfa;
   --shadow: 0 1px 3px rgba(0, 0, 0, .3), 0 12px 32px rgba(0, 0, 0, .35);
 }
 :root[data-theme="dark"][data-mode="training"] { --accent: #a78bfa; }
@@ -643,3 +657,138 @@ input[type="number"] {
   header.title .title-controls { gap: 6px; }
   header.title select { font-size: 12px; padding: 8px 4px; max-width: 100px; }
 }
+
+/* ---- Training programme ---- */
+.workout-field { margin-bottom: 16px; }
+.workout-field select {
+  width: 100%;
+  padding: 10px 12px;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  background: var(--bg);
+  color: var(--text);
+  font: inherit;
+}
+.workout-preview {
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 4px 14px 10px;
+  max-height: 340px;
+  overflow-y: auto;
+}
+.workout-block h3 { font-size: 14px; margin: 12px 0 6px; }
+.workout-block ol { margin: 0; padding-left: 20px; }
+.workout-block li { margin: 6px 0; }
+.workout-block li::marker { color: var(--muted); }
+.workout-block .name { display: block; font-weight: 600; }
+.workout-block .desc { display: block; color: var(--muted); font-size: 13px; line-height: 1.45; }
+
+.stage .exercise-desc {
+  color: var(--muted);
+  font-size: 15px;
+  line-height: 1.45;
+  max-width: 36em;
+  margin: -10px auto 16px;
+}
+
+/* ---- Block colours ----
+   [data-block] picks the colour; everything below just reads --block. */
+[data-block="1"] { --block: var(--block-1); }
+[data-block="2"] { --block: var(--block-2); }
+[data-block="3"] { --block: var(--block-3); }
+[data-block="4"] { --block: var(--block-4); }
+
+/* The running card wears the current block across its top, and the eyebrow
+   naming the block turns into a tag of the same colour. */
+#running[data-block] { box-shadow: inset 0 5px 0 var(--block), var(--shadow); }
+#running[data-block] .eyebrow {
+  display: inline-block;
+  padding: 3px 10px;
+  border-radius: 999px;
+  color: var(--block);
+  background: color-mix(in srgb, var(--block) 14%, transparent);
+}
+#running[data-block] #turn-count { color: var(--block); font-weight: 600; }
+
+/* The queue: a stripe per row says which block each exercise belongs to. */
+.queue li[data-block] { box-shadow: inset 3px 0 0 var(--block); padding-left: 12px; }
+.queue li[data-block].current { background: color-mix(in srgb, var(--block) 10%, transparent); }
+.queue li[data-block].current .num,
+.queue li[data-block].current .tag { color: var(--block); }
+.queue li[data-block].done { box-shadow: inset 3px 0 0 color-mix(in srgb, var(--block) 40%, transparent); }
+
+/* The setup preview, in the same colours. */
+.workout-block[data-block] { border-left: 3px solid var(--block); padding-left: 10px; margin-top: 10px; }
+.workout-block[data-block] h3 { color: var(--block); }
+
+/* ---- Block change ----
+   The rest between two blocks is an event, not a pause: the name pops in the
+   new block's colour, the card's band pulses, and the last seconds pop again
+   on "let's go". */
+#running.block-change .speaker {
+  color: var(--block, var(--accent));
+  animation: block-pop .7s cubic-bezier(.2, 1.5, .4, 1) both;
+}
+#running.block-change.block-go .speaker { animation: block-go .5s cubic-bezier(.2, 1.6, .4, 1) both; }
+#running.block-change[data-block] { animation: block-band 1.6s ease-in-out 2; }
+#running.block-change .exercise-desc {
+  color: var(--block, var(--text));
+  font-weight: 700;
+  font-size: 17px;
+  animation: block-slide .5s .25s ease-out both;
+}
+
+@keyframes block-pop {
+  0% { transform: scale(.4) rotate(-6deg); opacity: 0; }
+  60% { transform: scale(1.12) rotate(2deg); opacity: 1; }
+  100% { transform: none; }
+}
+@keyframes block-go {
+  0% { transform: scale(.6); }
+  50% { transform: scale(1.25); }
+  100% { transform: scale(1); }
+}
+@keyframes block-slide {
+  from { transform: translateY(8px); opacity: 0; }
+  to { transform: none; opacity: 1; }
+}
+@keyframes block-band {
+  50% { box-shadow: inset 0 10px 0 var(--block), 0 0 0 4px color-mix(in srgb, var(--block) 35%, transparent), var(--shadow); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  #running.block-change .speaker,
+  #running.block-change .exercise-desc,
+  #running.block-change[data-block] { animation: none; }
+}
+
+/* ---- Exercise figures ----
+   Stick figures in the block's colour; the props (floor, chair, wall) stay
+   neutral so the body is what the eye lands on. */
+.figure { display: block; width: 100%; height: 100%; }
+.figure-limb, .figure-head {
+  fill: none;
+  stroke: var(--block, var(--accent));
+  stroke-width: 5;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+.figure-limb.far { opacity: .45; }
+.figure-prop { fill: none; stroke: var(--muted); stroke-width: 3; stroke-linecap: round; opacity: .6; }
+
+.stage-main {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px 28px;
+  flex-wrap: wrap;
+}
+.exercise-figure {
+  width: clamp(110px, min(24vw, 22vh), 170px);
+  aspect-ratio: 1;
+  flex: 0 0 auto;
+}
+
+.workout-block li.has-figure { display: flex; gap: 10px; align-items: center; }
+.workout-block li.has-figure .figure { width: 52px; height: 52px; flex: 0 0 auto; }
+.workout-block li .text { min-width: 0; }

@@ -21,14 +21,13 @@ import { collectElements } from "./ui/elements.js";
 import { Fireworks } from "./ui/fireworks.js";
 import { KeyboardShortcuts, SCREEN } from "./ui/keyboard-shortcuts.js";
 import { PrerollCountdown } from "./ui/preroll-countdown.js";
-import { RunningScreen } from "./ui/running-screen.js";
+import { RunningScreen, BLOCK_GO_SECONDS } from "./ui/running-screen.js";
 import { SetupScreen, MODE } from "./ui/setup-screen.js";
 import { ShareButton } from "./ui/share-button.js";
 import { SummaryScreen } from "./ui/summary-screen.js";
 import { TabTitle } from "./ui/tab-title.js";
 
 import { createElement } from "./util/dom.js";
-import { minutesToSeconds } from "./util/time-format.js";
 import { APP_VERSION } from "./version.js";
 
 /** A turn ends one second past zero, leaving the overtime visible for a beat. */
@@ -137,10 +136,15 @@ export class App {
   }
 
   #buildSession(entries) {
-    const seconds = minutesToSeconds(this.#setupScreen.minutesPerItem);
+    const seconds = this.#setupScreen.secondsPerItem;
     if (this.#setupScreen.isTraining) {
       // A workout's sequence is deliberate, so exercises run as written.
-      return Session.forTraining(entries, seconds, this.#setupScreen.restSeconds);
+      return Session.forTraining(
+        this.#setupScreen.trainingBlocks,
+        seconds,
+        this.#setupScreen.restSeconds,
+        this.#setupScreen.blockRestSeconds
+      );
     }
     return Session.forStandup(
       orderNames(entries, this.#setupScreen.order, (a, b) => this.#translator.compareNames(a, b)),
@@ -154,6 +158,7 @@ export class App {
     this.#runningScreen.renderSegment(this.#session, this.#viewOptions);
     this.#runningScreen.renderPauseButton(false);
     this.#renderClock();
+    if (this.#session.isBlockChange) this.#chime.blockChange();
   }
 
   get #viewOptions() {
@@ -162,6 +167,14 @@ export class App {
 
   #onSecondChanged(remainingSeconds) {
     this.#renderClock();
+    // A block change counts down out loud into the next block, like the count-in.
+    if (
+      this.#session.isBlockChange &&
+      remainingSeconds > 0 &&
+      remainingSeconds <= BLOCK_GO_SECONDS
+    ) {
+      this.#chime.countdownTick();
+    }
     // One step per tick at most: the next turn gets a fresh deadline, so
     // coming back from a long absence never stampedes through the queue.
     if (
@@ -222,14 +235,16 @@ export class App {
   #renderClock() {
     const remaining = this.#timer.remainingSeconds;
     const resting = this.#session.isResting;
+    const blockChange = this.#session.isBlockChange;
     this.#runningScreen.renderClock(remaining, this.#timer.durationSeconds, {
       switchMode: this.#setupScreen.switchMode,
-      isResting: resting
+      isResting: resting,
+      isBlockChange: blockChange
     });
     this.#tabTitle.showTurn(
       remaining,
       resting
-        ? this.#translator.translate("restingNow")
+        ? this.#translator.translate(blockChange ? "blockChange" : "restingNow")
         : this.#session.currentLabel
     );
   }

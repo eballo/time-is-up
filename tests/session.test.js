@@ -6,6 +6,7 @@ import {
   SEGMENT,
   ITEM_STATUS,
   parseLines,
+  parseBlocks,
   orderNames,
   shuffle
 } from "../src/js/core/session.js";
@@ -239,6 +240,58 @@ describe("what a session records", () => {
       session.results.map((r) => r.label),
       ["A", "B"]
     );
+  });
+});
+
+describe("blocks", () => {
+  test("a blank line splits the list into blocks, however many blanks there are", () => {
+    assert.deepEqual(parseBlocks("A\nB\n\nC\n \n\n\nD\n"), [["A", "B"], ["C"], ["D"]]);
+  });
+
+  test("a list with no blank line is a single block", () => {
+    assert.deepEqual(parseBlocks("A\nB"), [["A", "B"]]);
+    assert.deepEqual(parseBlocks("\n\n"), []);
+  });
+
+  test("a workout made of blocks runs them in sequence, resting between every exercise", () => {
+    const session = Session.forTraining([["A", "B"], ["C"]], 30, 30);
+    assert.deepEqual(
+      walk(session, (s) => s.currentLabel),
+      ["A", null, "B", null, "C"]
+    );
+  });
+
+  test("only the rest leading into a new block announces it", () => {
+    const session = Session.forTraining([["A", "B"], ["C"]], 30, 30);
+    assert.equal(session.totalBlocks, 2);
+    assert.deepEqual(
+      walk(session, (s) => [s.isBlockChange, s.currentBlockPosition]),
+      [[false, 1], [false, 1], [false, 1], [true, 2], [false, 2]]
+    );
+  });
+
+  test("the rest between two blocks takes the block rest instead", () => {
+    const session = Session.forTraining([["A", "B"], ["C"]], 30, 20, 60);
+    assert.deepEqual(
+      walk(session, (s) => [s.currentLabel, s.currentSeconds]),
+      [["A", 30], [null, 20], ["B", 30], [null, 60], ["C", 30]]
+    );
+    assert.equal(session.plannedSeconds, 30 * 3 + 20 + 60);
+  });
+
+  test("a block rest still happens when exercises run back to back", () => {
+    const session = Session.forTraining([["A", "B"], ["C"]], 30, 0, 45);
+    assert.deepEqual(
+      walk(session, (s) => [s.currentLabel, s.isBlockChange]),
+      [["A", false], ["B", false], [null, true], ["C", false]]
+    );
+  });
+
+  test("a flat list and a stand-up are one block, with nothing to announce", () => {
+    const training = Session.forTraining(["A", "B"], 30, 10);
+    assert.equal(training.totalBlocks, 1);
+    assert.deepEqual(walk(training, (s) => s.isBlockChange), [false, false, false]);
+    assert.equal(Session.forStandup(["A", "B"], 60).totalBlocks, 1);
   });
 });
 

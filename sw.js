@@ -45,6 +45,7 @@ const APP_SHELL = [
   "src/js/services/theme-controller.js",
   "src/js/services/translator.js",
   "src/js/ui/elements.js",
+  "src/js/ui/exercise-figures.js",
   "src/js/ui/fireworks.js",
   "src/js/ui/keyboard-shortcuts.js",
   "src/js/ui/preroll-countdown.js",
@@ -60,7 +61,13 @@ const APP_SHELL = [
   "src/i18n/en.js",
   "src/i18n/es.js",
   "src/i18n/fr.js",
-  "src/i18n/nl.js"
+  "src/i18n/nl.js",
+  "src/i18n/workouts/index.js",
+  "src/i18n/workouts/ca.js",
+  "src/i18n/workouts/en.js",
+  "src/i18n/workouts/es.js",
+  "src/i18n/workouts/fr.js",
+  "src/i18n/workouts/nl.js"
 ];
 
 self.addEventListener("install", (event) => {
