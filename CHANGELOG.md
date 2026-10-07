@@ -58,6 +58,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   minutes by an earlier version is converted rather than lost. Stand-ups keep
   minutes per person.
 
+### Fixed
+
+- **No mixed versions after a deploy.** The service worker now checks every
+  request with the server instead of taking the browser's HTTP cache's word
+  for it, and precaches each release from the network. The modules import
+  one another and the host caches each for minutes, so straight after a
+  deploy a fresh `app.js` could meet a stale module beside it and fail on a
+  function that was not there yet. An unchanged file costs a 304.
+
 ## [1.3.0] - 2026-09-18
 
 ### Added

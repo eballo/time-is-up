@@ -75,7 +75,9 @@ self.addEventListener("install", (event) => {
   event.waitUntil(
     caches
       .open(CACHE_NAME)
-      .then((cache) => cache.addAll(APP_SHELL))
+      // "reload" goes past the browser's HTTP cache: a release must precache
+      // its own files, not whatever an earlier visit left lying there.
+      .then((cache) => cache.addAll(APP_SHELL.map((path) => new Request(path, { cache: "reload" }))))
       // A new release should not sit behind the old worker until every tab closes.
       .then(() => self.skipWaiting())
   );
@@ -102,7 +104,7 @@ self.addEventListener("fetch", (event) => {
 async function networkFirst(request) {
   const cache = await caches.open(CACHE_NAME);
   try {
-    const response = await fetchWithTimeout(request);
+    const response = await fetchWithTimeout(revalidating(request));
     if (response.ok) cache.put(request, response.clone());
     return response;
   } catch {
@@ -116,6 +118,20 @@ async function networkFirst(request) {
     }
     return Response.error();
   }
+}
+
+/**
+ * The same request, but checked with the server instead of answered from the
+ * browser's HTTP cache. The modules import one another, and the host caches
+ * each for minutes: straight after a deploy, a fresh app.js could otherwise
+ * meet a stale module beside it and call something that is not there yet.
+ * An unchanged file costs a 304, not a download.
+ */
+function revalidating(request) {
+  // A navigation cannot be copied with options, so it is rebuilt from its URL.
+  return request.mode === "navigate"
+    ? new Request(request.url, { cache: "no-cache" })
+    : new Request(request, { cache: "no-cache" });
 }
 
 function fetchWithTimeout(request) {
